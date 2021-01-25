@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+project( ORB )
+find_package( OpenCV REQUIRED )
+add_executable( ORB ORB )
+target_link_libraries( ORB ${OpenCV_LIBS} )
