@@ -30,7 +30,7 @@ generate
 //				q_b <= data_a;
 				ram[0] <= data_a;
 			end
-			else if (we_b) begin
+			else if (we_b) begin  
 //				q_a <= data_b;
 //				q_b <= data_b;
 				ram[0] <= data_b;
@@ -44,18 +44,26 @@ generate
 	    assign q_a = ram[0];
 	end
 	else begin	
-		always@(posedge clk) begin		
-			if (we_a) begin
+		always@(posedge clk) begin	
+			if (we_a && we_b) begin
 				ram[addr_a] <= data_a;
-			end        
-//            q_a <= ram[addr_a];
-		    else
-			if (we_b) begin
+				if(addr_a != addr_b) begin
+					ram[addr_b] <= data_b;
+				end
+				else begin
+				end				
+			end
+			else if(we_a) begin
+				ram[addr_a] <= data_a;
+			end
+			else if(we_b) begin
 				ram[addr_b] <= data_b;
 			end
-			
-//			q_b <= ram[addr_b];
+		    else begin
+		    end
 		end
+
+//			q_b <= ram[addr_b];
 	    assign q_b = ram[addr_b];
 	    assign q_a = ram[addr_a];
 	end
