@@ -71,7 +71,7 @@ reg [DATA_WIDTH-1:0] pl_in_r;  //input to sort node 0
 reg [DATA_WIDTH-1:0] pl_out_r;  //output from sort node 0
 
 
-reg [DATA_WIDTH-1:0] din_r;
+//reg [DATA_WIDTH-1:0] din_r;
 reg en_r;
 reg flush_flag;
 reg flush_en;
@@ -81,7 +81,7 @@ always@(posedge clk or negedge rstn) begin
 	if (!rstn) begin
 		//pl_in_r <= 0;
 		pl_out_r <= 0;
-		din_r <= 0;
+		//din_r <= 0;
 		dout <= 0;
 		en_r <= 0;
 		valid <= 0;
@@ -93,7 +93,7 @@ always@(posedge clk or negedge rstn) begin
 
 		valid <= (en_r || flush_en) && pl_out_r[DATA_WIDTH-1:DATA_WIDTH-2]==2'b00; 
 		en_r <= en;
-		din_r <= din;
+		//din_r <= din;
 		if (init) begin
 			pl_out_r <= INIT_DATA;
 			flush_flag <= 0;
@@ -101,14 +101,14 @@ always@(posedge clk or negedge rstn) begin
 
 		if (en_r)
 `ifdef _MAX_
-            if (cmp_lt(din_r, pl_out_r))
+            if (cmp_lt(din, pl_out_r))
 `else
-		    if (cmp_lt(pl_out_r, din_r))
+		    if (cmp_lt(pl_out_r, din))
 		        
 `endif
                 dout <= pl_out_r;
             else
-                dout <= din_r;
+                dout <= din;
         else if (flush_en) 
             dout <= pl_out_r;  
             
@@ -138,11 +138,11 @@ reg [DATA_WIDTH-1:0] pl_in_reg;
 always@(*) begin
     if (en_r)  
 `ifdef _MAX_
-        if (cmp_lt(din_r, pl_out_r))
+        if (cmp_lt(din, pl_out_r))
 `else
-        if (cmp_lt(pl_out_r, din_r))
+        if (cmp_lt(pl_out_r, din))
 `endif
-            pl_in_r = din_r;
+            pl_in_r = din;
         else
             pl_in_r = pl_out_r;
 
