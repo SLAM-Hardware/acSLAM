@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-module data_store
+module data_store_delay
 #(
 	parameter DATA_WIDTH = 32,
 	parameter ADDR_WIDTH = 5,
@@ -14,7 +14,7 @@ module data_store
 	input lm_we,
 	output [DATA_WIDTH-1:0] lm_dout,
 	
-	input [DATA_WIDTH-1:0] rm_din,  //ÓÒ
+	input [DATA_WIDTH-1:0] rm_din, 
 	input [ADDR_WIDTH-1:0] rm_addr,
 	input rm_we,
 	output [DATA_WIDTH-1:0] rm_dout,

@@ -1,10 +1,10 @@
 `timescale 1ns / 1ps
 
 //////////////////////////////////////////////////////////////////////////////////
-module heap_tb;
+module heap_delay_tb;
 parameter DATA_WIDTH = 8;
 parameter KEY_WIDTH = 4;
-parameter NLEVELS = 3;
+parameter NLEVELS = 2;
 
 
 	// Inputs
@@ -20,7 +20,7 @@ parameter NLEVELS = 3;
 	wire valid;
 
 	// Instantiate the Unit Under Test (UUT)
-	heap#(.DATA_WIDTH(DATA_WIDTH),.KEY_WIDTH(KEY_WIDTH),.NLEVELS(NLEVELS)) uut (
+	heap_delay#(.DATA_WIDTH(DATA_WIDTH),.KEY_WIDTH(KEY_WIDTH),.NLEVELS(NLEVELS)) uut (
 		.clk(clk), 
 		.rstn(rstn), 
 		.din(din), 
@@ -76,7 +76,7 @@ always@(posedge clk or negedge rstn)
 			begin
 				en <= 1;
 				if (en) begin
-					din[KEY_WIDTH-1:0] <= ({$random}%256);
+					din[KEY_WIDTH-1:0] <=  ({$random}%256);
 					din[DATA_WIDTH-1:KEY_WIDTH] <= 0;
 				end
 			end  

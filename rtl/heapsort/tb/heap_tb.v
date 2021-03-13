@@ -59,8 +59,9 @@ parameter NLEVELS = 3;
 		flush = 0;
 		// Wait 100 ns for global reset to finish
 		#100;
-      rstn = 1;
+        rstn = 1;
 		
+		//
 		// Add stimulus here
 		#40;
 		init = 1;

@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 //`define _MAX_   
-module heap
+module heap_delay
 #(
 	parameter DATA_WIDTH = 32,   
 	parameter KEY_WIDTH = 16, 
-	parameter NLEVELS = 4       
+	parameter NLEVELS = 2       
 	)
 (
 	input clk,    
@@ -18,7 +18,7 @@ module heap
 	output reg [DATA_WIDTH-1:0] dout,  
 	output reg valid 
 
-);
+    );
 localparam ADDR_WIDTH = NLEVELS; 
 `ifdef _MAX_  
 localparam INIT_DATA = {2'b11,{(DATA_WIDTH-2-KEY_WIDTH){1'b0}},{KEY_WIDTH{1'b1}}};
@@ -29,7 +29,6 @@ localparam FLUSH_DATA = {2'b11,{(DATA_WIDTH-2-KEY_WIDTH){1'b0}},{KEY_WIDTH{1'b1}
 `endif
 localparam HEAP_SIZE = (1<<(NLEVELS+1))-1;
 //wire between up memory and sorting node
-wire [(NLEVELS+1)*DATA_WIDTH-1:0] um_in;
 wire [(NLEVELS+1)*DATA_WIDTH-1:0] um_out;
 wire [(NLEVELS+1)*ADDR_WIDTH-1:0] um_addr;
 wire [(NLEVELS+1)-1:0] um_we;
@@ -71,7 +70,7 @@ reg [DATA_WIDTH-1:0] pl_in_r;  //input to sort node 0
 reg [DATA_WIDTH-1:0] pl_out_r;  //output from sort node 0
 
 
-reg [DATA_WIDTH-1:0] din_r;
+// reg [DATA_WIDTH-1:0] din_r;
 reg en_r;
 reg flush_flag;
 reg flush_en;
@@ -81,7 +80,7 @@ always@(posedge clk or negedge rstn) begin
 	if (!rstn) begin
 		//pl_in_r <= 0;
 		pl_out_r <= 0;
-		din_r <= 0;
+		// din_r <= 0;
 		dout <= 0;
 		en_r <= 0;
 		valid <= 0;
@@ -93,7 +92,7 @@ always@(posedge clk or negedge rstn) begin
 
 		valid <= (en_r || flush_en) && pl_out_r[DATA_WIDTH-1:DATA_WIDTH-2]==2'b00; 
 		en_r <= en;
-		din_r <= din;
+		// din_r <= din;
 		if (init) begin
 			pl_out_r <= INIT_DATA;
 			flush_flag <= 0;
@@ -101,14 +100,14 @@ always@(posedge clk or negedge rstn) begin
 
 		if (en_r)
 `ifdef _MAX_
-            if (cmp_lt(din_r, pl_out_r))
+            if (cmp_lt(din, pl_out_r))
 `else
-		    if (cmp_lt(pl_out_r, din_r))
+		    if (cmp_lt(pl_out_r, din))
 		        
 `endif
                 dout <= pl_out_r;
             else
-                dout <= din_r;
+                dout <= din;
         else if (flush_en) 
             dout <= pl_out_r;  
             
@@ -138,11 +137,11 @@ reg [DATA_WIDTH-1:0] pl_in_reg;
 always@(*) begin
     if (en_r)  
 `ifdef _MAX_
-        if (cmp_lt(din_r, pl_out_r))
+        if (cmp_lt(din, pl_out_r))
 `else
-        if (cmp_lt(pl_out_r, din_r))
+        if (cmp_lt(pl_out_r, din))
 `endif
-            pl_in_r = din_r;
+            pl_in_r = din;
         else
             pl_in_r = pl_out_r;
 
@@ -171,7 +170,6 @@ generate for (i=0; i<NLEVELS; i=i+1) begin: loop_a
 		.clk(clk), 
 		.rstn(rstn), 
 		.init(init), 
-		.um_in(um_in[i*DATA_WIDTH +: DATA_WIDTH]), 
 		.um_out(um_out[i*DATA_WIDTH +: DATA_WIDTH]), 
 		.um_addr(um_addr[i*ADDR_WIDTH +: ADDR_WIDTH]), 
 		.um_we(um_we[i]), 
@@ -214,9 +212,9 @@ generate for (i=0; i<NLEVELS; i=i+1) begin: loop_a
 		.rm_dout(rm_in[i*DATA_WIDTH +: DATA_WIDTH]), 
 		.nl_din(um_out[(i+1)*DATA_WIDTH +: DATA_WIDTH]), 
 		.nl_addr(um_addr[(i+1)*ADDR_WIDTH +: ADDR_WIDTH]),
-		.nl_we(um_we[i+1]), 
+		.nl_we(um_we[i+1]),
 		.nl_branch(pl_branch_out[i+1]), 
-		.nl_dout(um_in[(i+1)*DATA_WIDTH +: DATA_WIDTH])
+		.nl_dout()
 	);	
 	
 	if (i==0) begin
@@ -224,7 +222,6 @@ generate for (i=0; i<NLEVELS; i=i+1) begin: loop_a
 		assign pl_update_in[0] = en_r|flush_en;
 		assign pl_branch_in[0] = 0;
 		assign pl_addr_in[0*ADDR_WIDTH +: ADDR_WIDTH] = 0;
-        assign um_in[0*DATA_WIDTH +: DATA_WIDTH] = INIT_DATA;	
     end
 	else begin
 		assign pl_in[i*DATA_WIDTH +: DATA_WIDTH] = nl_out[(i-1)*DATA_WIDTH +: DATA_WIDTH];
