@@ -23,9 +23,7 @@ module data_store_delay
 	input [DATA_WIDTH-1:0] nl_din, 
 	input [ADDR_WIDTH-1:0] nl_addr,
 	input nl_we,
-	input nl_branch,	//0: left memory 1: right memory
-	output [DATA_WIDTH-1:0] nl_dout
-	
+	input nl_branch	//0: left memory 1: right memory
     );
 //port a for up sort node
 //port b for bottum sort node
@@ -37,7 +35,6 @@ module data_store_delay
 	
 	assign we_b_lm = nl_we & !nl_branch;  
 	assign we_b_rm = nl_we & nl_branch;
-	assign nl_dout = nl_branch ? q_b_rm : q_b_lm; 
 	
 	
 	dpram #(.DATA_WIDTH(DATA_WIDTH), .ADDR_WIDTH(ADDR_WIDTH), .LEVEL(LEVEL)) lm(

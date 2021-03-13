@@ -213,8 +213,7 @@ generate for (i=0; i<NLEVELS; i=i+1) begin: loop_a
 		.nl_din(um_out[(i+1)*DATA_WIDTH +: DATA_WIDTH]), 
 		.nl_addr(um_addr[(i+1)*ADDR_WIDTH +: ADDR_WIDTH]),
 		.nl_we(um_we[i+1]),
-		.nl_branch(pl_branch_out[i+1]), 
-		.nl_dout()
+		.nl_branch(pl_branch_out[i+1])
 	);	
 	
 	if (i==0) begin
