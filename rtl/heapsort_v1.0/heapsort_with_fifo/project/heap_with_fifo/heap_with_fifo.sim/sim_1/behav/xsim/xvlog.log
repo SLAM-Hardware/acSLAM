@@ -1,0 +1,22 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.gen/sources_1/ip/fifo_generator_0/sim/fifo_generator_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module fifo_generator_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/bram_baseline/bram_rtl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module block_ram_rtl
+INFO: [VRFC 10-2263] Analyzing Verilog file "F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/bram_baseline/data_store.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module data_store
+INFO: [VRFC 10-2263] Analyzing Verilog file "F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/bram_baseline/sort_node.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sort_node
+INFO: [VRFC 10-2263] Analyzing Verilog file "F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/bram_baseline/sub_heap.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sub_heap
+INFO: [VRFC 10-2263] Analyzing Verilog file "F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/Desktop/heap_rtl_new.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module heap_rtl
+INFO: [VRFC 10-2458] undeclared symbol fifo_emptyr4, assumed default net type wire [F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/Desktop/heap_rtl_new.v:118]
+INFO: [VRFC 10-2458] undeclared symbol fifo_en1, assumed default net type wire [F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/Desktop/heap_rtl_new.v:121]
+INFO: [VRFC 10-2458] undeclared symbol fifo_en2, assumed default net type wire [F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/Desktop/heap_rtl_new.v:122]
+INFO: [VRFC 10-2458] undeclared symbol rd_en1, assumed default net type wire [F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/Desktop/heap_rtl_new.v:160]
+INFO: [VRFC 10-2458] undeclared symbol rd_en2, assumed default net type wire [F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/Desktop/heap_rtl_new.v:185]
+INFO: [VRFC 10-2458] undeclared symbol flush_flag, assumed default net type wire [F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/Desktop/heap_rtl_new.v:262]
+INFO: [VRFC 10-2458] undeclared symbol flush_flag_1, assumed default net type wire [F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/Desktop/heap_rtl_new.v:292]
+INFO: [VRFC 10-2458] undeclared symbol flush_flag_2, assumed default net type wire [F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sources_1/imports/Desktop/heap_rtl_new.v:306]
+INFO: [VRFC 10-2263] Analyzing Verilog file "F:/Xilinx/user/vivado/heap_with_fifo/heap_with_fifo.srcs/sim_1/imports/bram_baseline/heap_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module heap_tb

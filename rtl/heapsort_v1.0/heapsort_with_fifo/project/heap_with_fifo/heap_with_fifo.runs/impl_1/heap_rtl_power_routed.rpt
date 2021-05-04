@@ -1,0 +1,237 @@
+Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+----------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version     : Vivado v.2020.2 (win64) Build 3064766 Wed Nov 18 09:12:45 MST 2020
+| Date             : Tue May  4 15:22:27 2021
+| Host             : DESKTOP-PJRTAN1 running 64-bit major release  (build 9200)
+| Command          : report_power -file heap_rtl_power_routed.rpt -pb heap_rtl_power_summary_routed.pb -rpx heap_rtl_power_routed.rpx
+| Design           : heap_rtl
+| Device           : xczu3eg-sbva484-1-e
+| Design State     : routed
+| Grade            : extended
+| Process          : typical
+| Characterization : Production
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+Power Report
+
+Table of Contents
+-----------------
+1. Summary
+1.1 On-Chip Components
+1.2 Power Supply Summary
+1.3 Confidence Level
+2. Settings
+2.1 Environment
+2.2 Clock Constraints
+3. Detailed Reports
+3.1 By Hierarchy
+
+1. Summary
+----------
+
++--------------------------+--------------+
+| Total On-Chip Power (W)  | 13.805       |
+| Design Power Budget (W)  | Unspecified* |
+| Power Budget Margin (W)  | NA           |
+| Dynamic (W)              | 13.457       |
+| Device Static (W)        | 0.348        |
+| Effective TJA (C/W)      | 2.7          |
+| Max Ambient (C)          | 62.2         |
+| Junction Temperature (C) | 62.8         |
+| Confidence Level         | Low          |
+| Setting File             | ---          |
+| Simulation Activity File | ---          |
+| Design Nets Matched      | NA           |
++--------------------------+--------------+
+* Specify Design Power Budget using, set_operating_conditions -design_power_budget <value in Watts>
+
+
+1.1 On-Chip Components
+----------------------
+
++----------------+-----------+----------+-----------+-----------------+
+| On-Chip        | Power (W) | Used     | Available | Utilization (%) |
++----------------+-----------+----------+-----------+-----------------+
+| CLB Logic      |     5.613 |     2838 |       --- |             --- |
+|   LUT as Logic |     5.409 |     1277 |     70560 |            1.81 |
+|   Register     |     0.204 |     1201 |    141120 |            0.85 |
+|   BUFG         |    <0.001 |        1 |        24 |            4.17 |
+|   Others       |     0.000 |       70 |       --- |             --- |
+| Signals        |     6.411 |     3025 |       --- |             --- |
+| Block RAM      |     1.309 |       13 |       216 |            6.02 |
+| I/O            |     0.124 |       22 |        82 |           26.83 |
+| Static Power   |     0.348 |          |           |                 |
+| Total          |    13.805 |          |           |                 |
++----------------+-----------+----------+-----------+-----------------+
+
+
+1.2 Power Supply Summary
+------------------------
+
++-----------------+-------------+-----------+-------------+------------+-------------+-------------+------------+
+| Source          | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
++-----------------+-------------+-----------+-------------+------------+-------------+-------------+------------+
+| Vccint          |       0.850 |    15.611 |      15.431 |      0.180 |       NA    | Unspecified | NA         |
+| Vccint_io       |       0.850 |     0.120 |       0.086 |      0.034 |       NA    | Unspecified | NA         |
+| Vccbram         |       0.850 |     0.257 |       0.255 |      0.003 |       NA    | Unspecified | NA         |
+| Vccaux          |       1.800 |     0.046 |       0.000 |      0.046 |       NA    | Unspecified | NA         |
+| Vccaux_io       |       1.800 |     0.026 |       0.001 |      0.025 |       NA    | Unspecified | NA         |
+| Vcco33          |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vcco25          |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vcco18          |       1.800 |     0.028 |       0.027 |      0.000 |       NA    | Unspecified | NA         |
+| Vcco15          |       1.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vcco135         |       1.350 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vcco12          |       1.200 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vcco10          |       1.000 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vccadc          |       1.800 |     0.008 |       0.000 |      0.008 |       NA    | Unspecified | NA         |
+| VCC_PSINTFP     |       0.850 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCC_PSINTLP     |       0.850 |     0.014 |       0.000 |      0.014 |       NA    | Unspecified | NA         |
+| VPS_MGTRAVCC    |       0.850 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCC_PSINTFP_DDR |       0.850 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCC_PSPLL       |       1.200 |     0.002 |       0.000 |      0.002 |       NA    | Unspecified | NA         |
+| VPS_MGTRAVTT    |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCCO_PSDDR_504  |       1.200 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCC_PSAUX       |       1.800 |     0.002 |       0.000 |      0.002 |       NA    | Unspecified | NA         |
+| VCC_PSBATT      |       1.200 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCC_PSDDR_PLL   |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCCO_PSIO0_500  |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCCO_PSIO1_501  |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCCO_PSIO2_502  |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCCO_PSIO3_503  |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| VCC_PSADC       |       1.800 |     0.002 |       0.000 |      0.002 |       NA    | Unspecified | NA         |
++-----------------+-------------+-----------+-------------+------------+-------------+-------------+------------+
+* The Vccint supply current exceeds the maximum limit of the selected package.  See the packaging and pinout user guide for limit values.
+
+
+1.3 Confidence Level
+--------------------
+
++-----------------------------+------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+| User Input Data             | Confidence | Details                                                | Action                                                                                                             |
++-----------------------------+------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+| Design implementation state | High       | Design is routed                                       |                                                                                                                    |
+| Clock nodes activity        | Low        | User specified less than 75% of clocks                 | Provide missing clock activity with a constraint file, simulation results or by editing the "By Clock Domain" view |
+| I/O nodes activity          | Low        | More than 75% of inputs are missing user specification | Provide missing input activity with simulation results or by editing the "By Resource Type -> I/Os" view           |
+| Internal nodes activity     | Medium     | User specified less than 25% of internal nodes         | Provide missing internal nodes activity with simulation results or by editing the "By Resource Type" views         |
+| Device models               | High       | Device models are Production                           |                                                                                                                    |
+|                             |            |                                                        |                                                                                                                    |
+| Overall confidence level    | Low        |                                                        |                                                                                                                    |
++-----------------------------+------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+
+
+2. Settings
+-----------
+
+2.1 Environment
+---------------
+
++-----------------------+--------------------------+
+| Ambient Temp (C)      | 25.0                     |
+| ThetaJA (C/W)         | 2.7                      |
+| Airflow (LFM)         | 250                      |
+| Heat Sink             | medium (Medium Profile)  |
+| ThetaSA (C/W)         | 8.8                      |
+| Board Selection       | medium (10"x10")         |
+| # of Board Layers     | 12to15 (12 to 15 Layers) |
+| Board Temperature (C) | 25.0                     |
++-----------------------+--------------------------+
+
+
+2.2 Clock Constraints
+---------------------
+
++-------+--------+-----------------+
+| Clock | Domain | Constraint (ns) |
++-------+--------+-----------------+
+
+
+3. Detailed Reports
+-------------------
+
+3.1 By Hierarchy
+----------------
+
++---------------------+-----------+
+| Name                | Power (W) |
++---------------------+-----------+
+| heap_rtl            |    13.457 |
+|   Heap1             |     6.537 |
+|     loop_a[0].U_DS  |     0.104 |
+|       lm            |     0.050 |
+|       rm            |     0.054 |
+|     loop_a[0].U_SN  |     1.223 |
+|     loop_a[1].U_DS  |     0.386 |
+|       lm            |     0.185 |
+|       rm            |     0.201 |
+|     loop_a[1].U_SN  |     0.711 |
+|     loop_a[2].U_DS  |     0.372 |
+|       lm            |     0.178 |
+|       rm            |     0.195 |
+|     loop_a[2].U_SN  |     0.839 |
+|     loop_a[3].U_DS  |     0.253 |
+|       lm            |     0.114 |
+|       rm            |     0.139 |
+|     loop_a[3].U_SN  |     0.663 |
+|     loop_a[4].U_DS  |     0.269 |
+|       lm            |     0.143 |
+|       rm            |     0.125 |
+|     loop_a[4].U_SN  |     0.713 |
+|     loop_a[5].U_DS  |     0.470 |
+|       lm            |     0.221 |
+|       rm            |     0.249 |
+|     loop_a[5].U_SN  |     0.203 |
+|   Heap2             |     6.345 |
+|     loop_a[0].U_DS  |     0.103 |
+|       lm            |     0.050 |
+|       rm            |     0.053 |
+|     loop_a[0].U_SN  |     1.210 |
+|     loop_a[1].U_DS  |     0.289 |
+|       lm            |     0.150 |
+|       rm            |     0.140 |
+|     loop_a[1].U_SN  |     0.769 |
+|     loop_a[2].U_DS  |     0.253 |
+|       lm            |     0.117 |
+|       rm            |     0.136 |
+|     loop_a[2].U_SN  |     0.793 |
+|     loop_a[3].U_DS  |     0.285 |
+|       lm            |     0.150 |
+|       rm            |     0.135 |
+|     loop_a[3].U_SN  |     0.622 |
+|     loop_a[4].U_DS  |     0.268 |
+|       lm            |     0.152 |
+|       rm            |     0.116 |
+|     loop_a[4].U_SN  |     0.716 |
+|     loop_a[5].U_DS  |     0.464 |
+|       lm            |     0.207 |
+|       rm            |     0.257 |
+|     loop_a[5].U_SN  |     0.192 |
+|   clk_IBUF_inst     |     0.006 |
+|   din_IBUF[0]_inst  |     0.009 |
+|   din_IBUF[10]_inst |     0.009 |
+|   din_IBUF[11]_inst |     0.008 |
+|   din_IBUF[12]_inst |     0.008 |
+|   din_IBUF[13]_inst |     0.008 |
+|   din_IBUF[14]_inst |     0.008 |
+|   din_IBUF[15]_inst |     0.008 |
+|   din_IBUF[1]_inst  |     0.009 |
+|   din_IBUF[2]_inst  |     0.009 |
+|   din_IBUF[3]_inst  |     0.010 |
+|   din_IBUF[4]_inst  |     0.009 |
+|   din_IBUF[5]_inst  |     0.009 |
+|   din_IBUF[6]_inst  |     0.009 |
+|   din_IBUF[7]_inst  |     0.008 |
+|   din_IBUF[8]_inst  |     0.008 |
+|   din_IBUF[9]_inst  |     0.009 |
+|   en_IBUF_inst      |     0.012 |
+|   fifo_1            |     0.034 |
+|     U0              |     0.034 |
+|       inst_fifo_gen |     0.034 |
+|   fifo_2            |     0.031 |
+|     U0              |     0.031 |
+|       inst_fifo_gen |     0.031 |
+|   flush_IBUF_inst   |     0.011 |
+|   init_IBUF_inst    |     0.038 |
+|   rstn_IBUF_inst    |     0.009 |
++---------------------+-----------+
+
+

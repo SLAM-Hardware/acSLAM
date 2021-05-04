@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="synth_1" LaunchPart="xczu3eg-sbva484-1-e" LaunchTime="1620111765">
+  <File Type="PA-TCL" Name="heap_rtl.tcl"/>
+  <File Type="REPORTS-TCL" Name="heap_rtl_reports.tcl"/>
+  <File Type="RDS-RDS" Name="heap_rtl.vds"/>
+  <File Type="RDS-UTIL" Name="heap_rtl_utilization_synth.rpt"/>
+  <File Type="RDS-UTIL-PB" Name="heap_rtl_utilization_synth.pb"/>
+  <File Type="RDS-DCP" Name="heap_rtl.dcp"/>
+  <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
+    <Filter Type="Srcs"/>
+    <File Path="$PSRCDIR/sources_1/imports/bram_baseline/bram_rtl.v">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="C:/Users/lyk/Desktop/SLAM-Hardware/rtl/heapsort/bram_baseline/bram_rtl.v"/>
+        <Attr Name="ImportTime" Val="1614297496"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/bram_baseline/data_store.v">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="C:/Users/lyk/Desktop/SLAM-Hardware/rtl/heapsort/bram_baseline/data_store.v"/>
+        <Attr Name="ImportTime" Val="1614296485"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/bram_baseline/sort_node.v">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="C:/Users/lyk/Desktop/SLAM-Hardware/rtl/heapsort/bram_baseline/sort_node.v"/>
+        <Attr Name="ImportTime" Val="1617173289"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/bram_baseline/sub_heap.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/bram_baseline/heap_rtl.v">
+      <FileInfo>
+        <Attr Name="UserDisabled" Val="1"/>
+        <Attr Name="ImportPath" Val="C:/Users/lyk/Desktop/SLAM-Hardware/rtl/heapsort/bram_baseline/heap_rtl.v"/>
+        <Attr Name="ImportTime" Val="1617708796"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/Desktop/heap_rtl_new.v">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="C:/Users/lyk/Desktop/heap_rtl_new.v"/>
+        <Attr Name="ImportTime" Val="1619625737"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="DesignMode" Val="RTL"/>
+      <Option Name="TopModule" Val="heap_rtl"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
+    <Filter Type="Constrs"/>
+    <Config>
+      <Option Name="ConstrsType" Val="XDC"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="utils" Type="Utils" RelSrcDir="$PSRCDIR/utils_1">
+    <Filter Type="Utils"/>
+    <Config>
+      <Option Name="TopAutoSet" Val="TRUE"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
+    <Step Id="synth_design"/>
+  </Strategy>
+  <BlockFileSet Type="BlockSrcs" Name="fifo_generator_0"/>
+</GenRun>

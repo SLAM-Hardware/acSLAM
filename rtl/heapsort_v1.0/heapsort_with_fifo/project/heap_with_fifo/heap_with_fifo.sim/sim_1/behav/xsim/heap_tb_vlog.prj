@@ -1,0 +1,15 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../heap_with_fifo.gen/sources_1/ip/fifo_generator_0/sim/fifo_generator_0.v" \
+"../../../../heap_with_fifo.srcs/sources_1/imports/bram_baseline/bram_rtl.v" \
+"../../../../heap_with_fifo.srcs/sources_1/imports/bram_baseline/data_store.v" \
+"../../../../heap_with_fifo.srcs/sources_1/imports/bram_baseline/sort_node.v" \
+"../../../../heap_with_fifo.srcs/sources_1/imports/bram_baseline/sub_heap.v" \
+"../../../../heap_with_fifo.srcs/sources_1/imports/Desktop/heap_rtl_new.v" \
+"../../../../heap_with_fifo.srcs/sim_1/imports/bram_baseline/heap_tb.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

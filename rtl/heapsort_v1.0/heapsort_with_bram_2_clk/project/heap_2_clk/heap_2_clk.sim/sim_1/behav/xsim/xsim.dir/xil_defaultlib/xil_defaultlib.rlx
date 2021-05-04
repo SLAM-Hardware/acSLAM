@@ -1,0 +1,10 @@
+0.7
+2020.2
+Nov 18 2020
+09:47:47
+F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.sim/sim_1/behav/xsim/glbl.v,1605673889,verilog,,,,glbl,,,,,,,,
+F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.srcs/sources_1/imports/bram_2_clk/bram_rtl.v,1614297496,verilog,,F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.srcs/sources_1/imports/bram_2_clk/data_store.v,,block_ram_rtl,,,,,,,,
+F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.srcs/sources_1/imports/bram_2_clk/data_store.v,1614296485,verilog,,F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.srcs/sources_1/imports/bram_2_clk/heap.v,,data_store,,,,,,,,
+F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.srcs/sources_1/imports/bram_2_clk/heap.v,1620112692,verilog,,F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.srcs/sources_1/imports/bram_2_clk/sort_node.v,,heap,,,,,,,,
+F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.srcs/sources_1/imports/bram_2_clk/heap_tb.v,1620098898,verilog,,,,heap_tb,,,,,,,,
+F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.srcs/sources_1/imports/bram_2_clk/sort_node.v,1620098671,verilog,,F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.srcs/sources_1/imports/bram_2_clk/heap_tb.v,,sort_node,,,,,,,,

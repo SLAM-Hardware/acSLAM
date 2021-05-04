@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2020.2 (64-bit)
+# SW Build 3064766 on Wed Nov 18 09:12:45 MST 2020
+# IP Build 3064653 on Wed Nov 18 14:17:31 MST 2020
+# Start of session at: Tue May  4 15:18:24 2021
+# Process ID: 15632
+# Current directory: F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.runs/synth_1
+# Command line: vivado.exe -log heap.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source heap.tcl
+# Log file: F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.runs/synth_1/heap.vds
+# Journal file: F:/Xilinx/user/vivado/heap_2_clk/heap_2_clk.runs/synth_1\vivado.jou
+#-----------------------------------------------------------
+source heap.tcl -notrace
