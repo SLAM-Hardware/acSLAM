@@ -149,7 +149,6 @@ void process_scale_1(hls::stream<ap_axiu<INPUT_STREAM_BIT, 1, 1, 1> > &srcStream
 
 void process(hls::stream<ap_axiu<INPUT_STREAM_BIT, 1, 1, 1> > &srcStream, hls::stream<ap_axiu<OUTPUT_STREAM_BIT, 1, 1, 1> > &outStream)
 {
-#pragma HLS INLINE off
 #pragma HLS DATAFLOW
 	hls::stream<ap_uint<PROCESS_BIT> > pixelData;
 #pragma HLS STREAM variable = pixelData depth = 2 dim = 1

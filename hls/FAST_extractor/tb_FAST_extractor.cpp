@@ -73,8 +73,6 @@ int main()
 	ap_axiu<OUTPUT_STREAM_BIT,1,1,1> outData;
 	ap_axiu<OUTPUT_STREAM_BIT,1,1,1> outData1;
 	cnt = 0;
-	// do
-	// {
 
 	ofstream ofile;
 	ofile.open("C:/slam/HLS_project/fast_para_copy/result.txt");
@@ -83,7 +81,6 @@ int main()
 	for (int row = 0; row < new_height; row++){
 		cnt = 0;
 		for (int col = 0; col < ceil(float(new_width) / INPUT_PIXEL_NUM); col++){
-			// cout << row << " " << col << " " << cnt << endl;
 			outData = outPixelStream.read();
 			ap_uint<OUTPUT_BIT> tmp = outData.data;
 
@@ -105,34 +102,7 @@ int main()
 			}
 		}
 	}
-	// }while (outData.last == 0 && cnt < new_height*new_width);
 	ofile.close();
-// 	ofstream file;
-// 	file.open("/media/cheng/Windows/slam/HLS_project/fast_para_copy/result.txt");
-// 	for (int i = 0; i < new_height; i++)
-// 	{
-// 		for (int j = 0; j < new_width; j++)
-// 		{
-// 			 cout << new_img[i][j] << " ";
-// 			 file << new_img[i][j] << " " << FAST_buf[i][j].range(0,0) << " " << FAST_buf[i][j].range(7,1) << endl;
-// 		}
-// //			if (new_img[i][j]!=img_gray[i][j])
-// //				cout << "error" << endl;
-// 		 cout << endl;
-
-// 	}
-// 	cout <<"-----------------------finish-------------------------";
-// 	file.close();
-// 	file.open("/media/cheng/Windows/slam/HLS_project/fast_para_copy/FAST_result.txt");
-// 	for (int i = 0; i < new_height; i++)
-// 	{
-// 		for (int j = 0; j < new_width; j++)
-// 		{
-// 			 file << FAST_buf[i][j] << ", ";
-// 		}
-// 		 file << endl;
-// 	}
-// 	file.close();
 
 	ofile.open("C:/slam/HLS_project/fast_para_copy/result_test.txt");
 	ofile << new_width << endl;

@@ -331,25 +331,11 @@ void RS_BRIEF(hls::stream <ap_axiu<32, 1, 1, 1> > &cfgStream, hls::stream <ap_ax
 #pragma HLS INTERFACE axis register both port = srcFASTStream
 #pragma HLS INTERFACE axis register both port = outStream
 
-//    width = cfgStream.read().data;
-//    height = cfgStream.read().data;
-//
-//    ap_ufixed<WIDTH_BIT + 8, WIDTH_BIT> unit_num_ufixed = width;
-//    unit_num_ufixed = my_ceil<ap_ufixed < WIDTH_BIT + 8, WIDTH_BIT>, WIDTH_BIT + 8, WIDTH_BIT >
-//                                                                                    (unit_num_ufixed / INPUT_PIXEL_NUM);
-//    unit_num = unit_num_ufixed.range(WIDTH_BIT + 7, 8);
-//
-//    ap_ufixed<WIDTH_BIT + 8, WIDTH_BIT> padding_unit_num_ufixed = width + WIN_SZ - 1;
-//    padding_unit_num_ufixed = my_ceil<ap_ufixed < WIDTH_BIT + 8, WIDTH_BIT>, WIDTH_BIT + 8, WIDTH_BIT >
-//                                                                                            (padding_unit_num_ufixed /
-//                                                                                             INPUT_PIXEL_NUM);
-//    padding_unit_num = padding_unit_num_ufixed.range(WIDTH_BIT + 7, 8);
 	process_cfg(cfgStream);
     process_mdl(srcPixelStream, srcFASTStream, outStream);
 }
 
 void process_cfg(hls::stream <ap_axiu<32, 1, 1, 1> > &cfgStream) {
-// #pragma HLS INLINE off
 #pragma HLS PIPELINE
     width = cfgStream.read().data;
     height = cfgStream.read().data;
@@ -369,7 +355,6 @@ void process_cfg(hls::stream <ap_axiu<32, 1, 1, 1> > &cfgStream) {
 void process_mdl(hls::stream <ap_axiu<INPUT_STREAM_BIT, 1, 1, 1> > &srcPixelStream,
              hls::stream <ap_axiu<INPUT_STREAM_BIT, 1, 1, 1> > &srcFASTStream,
              hls::stream <ap_axiu<512, 1, 1, 1> > &outStream) {
-// #pragma HLS INLINE off
 #pragma HLS DATAFLOW
     hls::stream <ap_uint<INPUT_BIT> > pixelData;
 #pragma HLS STREAM variable = pixelData depth = 2
@@ -430,68 +415,68 @@ void process_input(hls::stream <ap_axiu<INPUT_STREAM_BIT, 1, 1, 1> > &srcPixelSt
                    hls::stream <ap_uint<INPUT_BIT> > &pixelData, hls::stream <ap_uint<INPUT_BIT> > &FASTData) {
 #pragma HLS INLINE off
 
-//     input from PS or tb
-    ap_uint<PIXEL_NUM_BIT> cnt = 0;
-    ap_uint<INPUT_BIT> pixel_data = 0;
-    ap_uint<INPUT_BIT> pixel_prv_data = 0;
-    ap_uint<INPUT_BIT> FAST_data = 0;
-    ap_uint<INPUT_BIT> FAST_prv_data = 0;
-    ap_uint<11> rmn_num = 0;
-    ap_uint<11> write_num = 0;
-    ap_uint<INPUT_BIT> pixel_write_tmp = 0;
-    ap_uint<INPUT_BIT> FAST_write_tmp = 0;
-    for (ap_uint<HEIGHT_BIT> i = 0; i < height; i++) {
-        for (ap_uint<WIDTH_BIT> j = 0; j < unit_num; j++) {
-#pragma HLS PIPELINE
-            if (j == unit_num - 1)
-                write_num = (width - INPUT_PIXEL_NUM * (unit_num - 1)) * PIXEL_BIT;
-            else
-                write_num = INPUT_PIXEL_NUM * PIXEL_BIT;
-
-            if (rmn_num >= write_num) {
-                pixel_write_tmp = 0;
-                FAST_write_tmp = 0;
-                pixel_write_tmp.range(write_num - 1, 0) = pixel_data.range(INPUT_BIT - rmn_num + write_num - 1,
-                                                                           INPUT_BIT - rmn_num);
-                FAST_write_tmp.range(write_num - 1, 0) = FAST_data.range(INPUT_BIT - rmn_num + write_num - 1,
-                                                                         INPUT_BIT - rmn_num);
-                rmn_num = rmn_num - write_num;
-            } else {
-                pixel_prv_data = pixel_data;
-                pixel_data = srcPixelStream.read().data;
-                FAST_prv_data = FAST_data;
-                FAST_data = srcFASTStream.read().data;
-                if (rmn_num > 0) {
-                    pixel_write_tmp = 0;
-                    FAST_write_tmp = 0;
-                    pixel_write_tmp.range(rmn_num - 1, 0) = pixel_prv_data.range(INPUT_BIT - 1, INPUT_BIT - rmn_num);
-                    pixel_write_tmp.range(write_num - 1, rmn_num) = pixel_data.range(write_num - rmn_num - 1, 0);
-                    FAST_write_tmp.range(rmn_num - 1, 0) = FAST_prv_data.range(INPUT_BIT - 1, INPUT_BIT - rmn_num);
-                    FAST_write_tmp.range(write_num - 1, rmn_num) = FAST_data.range(write_num - rmn_num - 1, 0);
-                    rmn_num = INPUT_BIT - (write_num - rmn_num);
-                } else {
-                    pixel_write_tmp = 0;
-                    FAST_write_tmp = 0;
-                    pixel_write_tmp.range(write_num - 1, 0) = pixel_data.range(write_num - 1, 0);
-                    FAST_write_tmp.range(write_num - 1, 0) = FAST_data.range(write_num - 1, 0);
-                    rmn_num = INPUT_BIT - write_num;
-                }
-            }
-            pixelData.write(pixel_write_tmp);
-            FASTData.write(FAST_write_tmp);
-        }
-    }
-
-//     input from PL FAST module
+//     input from PS
+//     ap_uint<PIXEL_NUM_BIT> cnt = 0;
+//     ap_uint<INPUT_BIT> pixel_data = 0;
+//     ap_uint<INPUT_BIT> pixel_prv_data = 0;
+//     ap_uint<INPUT_BIT> FAST_data = 0;
+//     ap_uint<INPUT_BIT> FAST_prv_data = 0;
+//     ap_uint<11> rmn_num = 0;
+//     ap_uint<11> write_num = 0;
+//     ap_uint<INPUT_BIT> pixel_write_tmp = 0;
+//     ap_uint<INPUT_BIT> FAST_write_tmp = 0;
 //     for (ap_uint<HEIGHT_BIT> i = 0; i < height; i++) {
 //         for (ap_uint<WIDTH_BIT> j = 0; j < unit_num; j++) {
 // #pragma HLS PIPELINE
-//             ap_uint<INPUT_BIT> pixel_data = srcPixelStream.read().data;
-//             ap_uint<INPUT_BIT> FAST_data = srcFASTStream.read().data;
-//             pixelData.write(pixel_data);
-//             FASTData.write(FAST_data);
+//             if (j == unit_num - 1)
+//                 write_num = (width - INPUT_PIXEL_NUM * (unit_num - 1)) * PIXEL_BIT;
+//             else
+//                 write_num = INPUT_PIXEL_NUM * PIXEL_BIT;
+
+//             if (rmn_num >= write_num) {
+//                 pixel_write_tmp = 0;
+//                 FAST_write_tmp = 0;
+//                 pixel_write_tmp.range(write_num - 1, 0) = pixel_data.range(INPUT_BIT - rmn_num + write_num - 1,
+//                                                                            INPUT_BIT - rmn_num);
+//                 FAST_write_tmp.range(write_num - 1, 0) = FAST_data.range(INPUT_BIT - rmn_num + write_num - 1,
+//                                                                          INPUT_BIT - rmn_num);
+//                 rmn_num = rmn_num - write_num;
+//             } else {
+//                 pixel_prv_data = pixel_data;
+//                 pixel_data = srcPixelStream.read().data;
+//                 FAST_prv_data = FAST_data;
+//                 FAST_data = srcFASTStream.read().data;
+//                 if (rmn_num > 0) {
+//                     pixel_write_tmp = 0;
+//                     FAST_write_tmp = 0;
+//                     pixel_write_tmp.range(rmn_num - 1, 0) = pixel_prv_data.range(INPUT_BIT - 1, INPUT_BIT - rmn_num);
+//                     pixel_write_tmp.range(write_num - 1, rmn_num) = pixel_data.range(write_num - rmn_num - 1, 0);
+//                     FAST_write_tmp.range(rmn_num - 1, 0) = FAST_prv_data.range(INPUT_BIT - 1, INPUT_BIT - rmn_num);
+//                     FAST_write_tmp.range(write_num - 1, rmn_num) = FAST_data.range(write_num - rmn_num - 1, 0);
+//                     rmn_num = INPUT_BIT - (write_num - rmn_num);
+//                 } else {
+//                     pixel_write_tmp = 0;
+//                     FAST_write_tmp = 0;
+//                     pixel_write_tmp.range(write_num - 1, 0) = pixel_data.range(write_num - 1, 0);
+//                     FAST_write_tmp.range(write_num - 1, 0) = FAST_data.range(write_num - 1, 0);
+//                     rmn_num = INPUT_BIT - write_num;
+//                 }
+//             }
+//             pixelData.write(pixel_write_tmp);
+//             FASTData.write(FAST_write_tmp);
 //         }
 //     }
+
+//     input from PL FAST module
+    for (ap_uint<HEIGHT_BIT> i = 0; i < height; i++) {
+        for (ap_uint<WIDTH_BIT> j = 0; j < unit_num; j++) {
+#pragma HLS PIPELINE
+            ap_uint<INPUT_BIT> pixel_data = srcPixelStream.read().data;
+            ap_uint<INPUT_BIT> FAST_data = srcFASTStream.read().data;
+            pixelData.write(pixel_data);
+            FASTData.write(FAST_data);
+        }
+    }
 }
 
 void process_padding(hls::stream <ap_uint<INPUT_BIT> > &pixelData, hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &initData, hls::stream <ap_uint<INPUT_BIT> > &srcData) {
@@ -1131,88 +1116,6 @@ void process_RS_BRIEF(hls::stream <ap_uint<PIXEL_BIT * (WIN_SZ + PROCESS_NUM - 1
                     ures *= (i - HALF_WIN_SZ);
                     m_10 += ures;
                 }
-    //         for (ap_int<8> i = 0; i < 25; i++) {
-    // #pragma HLS UNROLL
-    //             ap_uint<8> vres0[32];
-    // #pragma HLS ARRAY_PARTITION variable = vres0 complete dim = 1
-    //             ap_uint<9> vres1[16];
-    // #pragma HLS ARRAY_PARTITION variable = vres1 complete dim = 1
-    //             ap_uint<10> vres2[8];
-    // #pragma HLS ARRAY_PARTITION variable = vres2 complete dim = 1
-    //             ap_uint<11> vres3[4];
-    // #pragma HLS ARRAY_PARTITION variable = vres3 complete dim = 1
-    //             ap_uint<12> vres4[2];
-    // #pragma HLS ARRAY_PARTITION variable = vres4 complete dim = 1
-    //             ap_uint<13> vres5;
-    //             ap_int<19> vres;
-    //             for (ap_uint<6> im = 0; im < 32; im++) {
-    // #pragma HLS UNROLL
-    //                 if (im < 25)
-    //                     vres0[im] = win_buf_tmp[win_ind[i]][im] & mask[i][im];
-    //                 else
-    //                     vres0[im] = 0;
-    //             }
-    //             for (ap_uint<6> i0 = 0; i0 < 16; i0++) {
-    // #pragma HLS UNROLL
-    //                 vres1[i0] = vres0[i0 << 1] + vres0[(i0 << 1) + 1];
-    //             }
-    //             for (ap_uint<6> i1 = 0; i1 < 8; i1++) {
-    // #pragma HLS UNROLL
-    //                 vres2[i1] = vres1[i1 << 1] + vres1[(i1 << 1) + 1];
-    //             }
-    //             for (ap_uint<6> i3 = 0; i3 < 4; i3++) {
-    // #pragma HLS UNROLL
-    //                 vres3[i3] = vres2[i3 << 1] + vres2[(i3 << 1) + 1];
-    //             }
-    //             for (ap_uint<6> i4 = 0; i4 < 2; i4++) {
-    // #pragma HLS UNROLL
-    //                 vres4[i4] = vres3[i4 << 1] + vres3[(i4 << 1) + 1];
-    //             }
-    //             vres5 = vres4[0] + vres4[1];
-    //             vres = vres5;
-    //             vres = vres * (i - 12);
-    //             m_01 += vres;
-
-    //             unsigned char ures0[32];
-    // #pragma HLS ARRAY_PARTITION variable = ures0 complete dim = 1
-    //             ap_uint<9> ures1[16];
-    // #pragma HLS ARRAY_PARTITION variable = ures1 complete dim = 1
-    //             ap_uint<10> ures2[8];
-    // #pragma HLS ARRAY_PARTITION variable = ures2 complete dim = 1
-    //             ap_uint<11> ures3[4];
-    // #pragma HLS ARRAY_PARTITION variable = ures3 complete dim = 1
-    //             ap_uint<12> ures4[2];
-    // #pragma HLS ARRAY_PARTITION variable = ures4 complete dim = 1
-    //             ap_uint<13> ures5;
-    //             ap_int<19> ures;
-    //             for (ap_uint<6> im = 0; im < 32; im++) {
-    // #pragma HLS UNROLL
-    //                 if (im < 25)
-    //                     ures0[im] = win_buf_tmp[win_ind[im]][i] & mask[im][i];
-    //                 else
-    //                     ures0[im] = 0;
-    //             }
-    //         for (ap_uint<6> i0 = 0; i0 < 16; i0++) {
-    // #pragma HLS UNROLL
-    //                 ures1[i0] = ures0[i0 << 1] + ures0[(i0 << 1) + 1];
-    //             }
-    //             for (ap_uint<6> i1 = 0; i1 < 8; i1++) {
-    // #pragma HLS UNROLL
-    //                 ures2[i1] = ures1[i1 << 1] + ures1[(i1 << 1) + 1];
-    //             }
-    //                 for (ap_uint<6> i3 = 0; i3 < 4; i3++) {
-    // #pragma HLS UNROLL
-    //                 ures3[i3] = ures2[i3 << 1] + ures2[(i3 << 1) + 1];
-    //             }
-    //         for (ap_uint<6> i4 = 0; i4 < 2; i4++) {
-    // #pragma HLS UNROLL
-    //                 ures4[i4] = ures3[i4 << 1] + ures3[(i4 << 1) + 1];
-    //             }
-    //             ures5 = ures4[0] + ures4[1];
-    //             ures = ures5;
-    //             ures = ures * (i - 12);
-    //             m_10 += ures;
-    //         }
                 ap_uint<9> angle;
                 ap_uint<256> desc;
                 ap_fixed<24, 23> m_10_f, m_01_f;
@@ -1265,7 +1168,6 @@ void process_RS_BRIEF(hls::stream <ap_uint<PIXEL_BIT * (WIN_SZ + PROCESS_NUM - 1
                     outStream.write(outVal);
                 }
             }
-        // cout << row_ind << " " << col_ind << endl;
     }
     while (row_ind!=511 && col_ind!=2047);
 }

@@ -51,7 +51,6 @@ void FAST(hls::stream <ap_axiu<32, 1, 1, 1> > &cfgStream, hls::stream <ap_axiu<I
 }
 
 void process_cfg(hls::stream <ap_axiu<32, 1, 1, 1> > &cfgStream, hls::stream <ap_axiu<32, 1, 1, 1> > &cfgoutStream) {
-//#pragma HLS INLINE off
 #pragma HLS PIPELINE
     width = cfgStream.read().data;
     height = cfgStream.read().data;
@@ -81,7 +80,6 @@ void process_cfg(hls::stream <ap_axiu<32, 1, 1, 1> > &cfgStream, hls::stream <ap
 void process(hls::stream <ap_axiu<INPUT_STREAM_BIT, 1, 1, 1> > &srcStream,
              hls::stream <ap_axiu<OUTPUT_STREAM_BIT, 1, 1, 1> > &outPixelStream,
              hls::stream <ap_axiu<OUTPUT_STREAM_BIT, 1, 1, 1> > &outFASTStream) {
-// #pragma HLS INLINE off
 #pragma HLS DATAFLOW
     hls::stream <ap_uint<INPUT_BIT> > pixelData;
 #pragma HLS STREAM variable = pixelData depth = 2
@@ -674,128 +672,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &initData,
     }
 #endif
 }
-// void
-// process_FAST(ap_uint<PIXEL_BIT> win_buf[WIN_SZ][WIN_SZ + PROCESS_NUM - 1], ap_uint<PIXEL_BIT> gaus_buf[PROCESS_NUM],
-//              ap_uint<PIXEL_BIT> FAST_buf[PROCESS_NUM],ap_uint<WIN_SZ_BIT> win_ind[WIN_SZ]) {
-// #pragma HLS INLINE
-// #define win_buf_center(x, y) win_buf[win_ind[x+i]][y+j]
-//     ap_uint<7> NMS_score_buf[3][PROCESS_NUM + 2];
-// #pragma HLS ARRAY_PARTITION variable = NMS_score_buf complete dim = 0
-//     ap_uint<1> NMS_FAST_buf[3][PROCESS_NUM + 2];
-// #pragma HLS ARRAY_PARTITION variable = NMS_FAST_buf complete dim = 0
-//         for (ap_uint<11> loop_ind = 0; loop_ind < (2 + PROCESS_NUM)*3; loop_ind++) {
-// #pragma HLS UNROLL
-//             ap_uint<3> i = loop_ind / (2 + PROCESS_NUM);
-//             ap_uint<8> j = loop_ind - i*(2 + PROCESS_NUM);
-//             ap_int<9> diff[16];
-// #pragma HLS ARRAY_PARTITION variable=diff complete dim=1
 
-//             diff[0] = win_buf_center(3, 3) - win_buf_center(0, 3);
-//             diff[1] = win_buf_center(3, 3) - win_buf_center(0, 4);
-//             diff[2] = win_buf_center(3, 3) - win_buf_center(1, 5);
-//             diff[3] = win_buf_center(3, 3) - win_buf_center(2, 6);
-//             diff[4] = win_buf_center(3, 3) - win_buf_center(3, 6);
-//             diff[5] = win_buf_center(3, 3) - win_buf_center(4, 6);
-//             diff[6] = win_buf_center(3, 3) - win_buf_center(5, 5);
-//             diff[7] = win_buf_center(3, 3) - win_buf_center(6, 4);
-//             diff[8] = win_buf_center(3, 3) - win_buf_center(6, 3);
-//             diff[9] = win_buf_center(3, 3) - win_buf_center(6, 2);
-//             diff[10] = win_buf_center(3, 3) - win_buf_center(5, 1);
-//             diff[11] = win_buf_center(3, 3) - win_buf_center(4, 0);
-//             diff[12] = win_buf_center(3, 3) - win_buf_center(3, 0);
-//             diff[13] = win_buf_center(3, 3) - win_buf_center(2, 0);
-//             diff[14] = win_buf_center(3, 3) - win_buf_center(1, 1);
-//             diff[15] = win_buf_center(3, 3) - win_buf_center(0, 2);
-
-
-//             ap_uint<1> posJudge[24];
-// #pragma HLS ARRAY_PARTITION variable=posJudge complete dim=1
-//             ap_uint<1> negJudge[24];
-// #pragma HLS ARRAY_PARTITION variable=negJudge complete dim=1
-//             ap_uint<12> FAST_score;
-
-//             for (ap_uint<5> ii = 0; ii < 16; ii++) {
-// #pragma HLS unroll
-//                 posJudge[ii] = (diff[ii] > THRESHOLD) ? 1 : 0;
-//                 negJudge[ii] = (diff[ii] < -THRESHOLD) ? 1 : 0;
-//             }
-
-
-//             for (ap_uint<5> ii = 0; ii < 8; ii++) {
-// #pragma HLS unroll
-//                 posJudge[ii + 16] = (diff[ii] > THRESHOLD) ? 1 : 0;
-//                 negJudge[ii + 16] = (diff[ii] < -THRESHOLD) ? 1 : 0;
-//             }
-
-//             ap_uint<12> score_tmp =
-//                     my_abs(diff[0]) + my_abs(diff[1]) + my_abs(diff[2]) + my_abs(diff[3]) + my_abs(diff[4]) +
-//                     my_abs(diff[5]) + my_abs(diff[6]) + my_abs(diff[7]) + my_abs(diff[8]) + my_abs(diff[9]) +
-//                     my_abs(diff[10]) + my_abs(diff[11]) + my_abs(diff[12]) + my_abs(diff[13]) + my_abs(diff[14]) +
-//                     my_abs(diff[15]);
-
-//             NMS_score_buf[i][j] = score_tmp.range(11, 5);
-
-//             ap_uint<1> fpJudge[16];
-// #pragma HLS ARRAY_PARTITION variable=fpJudge complete dim=1
-//             for (ap_uint<5> ii = 0; ii < 16; ii++) {
-// #pragma HLS unroll
-//                 fpJudge[ii] =
-//                         (posJudge[ii] & posJudge[ii + 1] & posJudge[ii + 2] & posJudge[ii + 3] & posJudge[ii + 4] &
-//                          posJudge[ii + 5] & posJudge[ii + 6] & posJudge[ii + 7] & posJudge[ii + 8]) |
-//                         (negJudge[ii] & negJudge[ii + 1] & negJudge[ii + 2] & negJudge[ii + 3] & negJudge[ii + 4] &
-//                          negJudge[ii + 5] & negJudge[ii + 6] & negJudge[ii + 7] & negJudge[ii + 8]);
-//             }
-//             NMS_FAST_buf[i][j] = (fpJudge[0] | fpJudge[1] | fpJudge[2] | fpJudge[3] | fpJudge[4] | fpJudge[5] |
-//                                   fpJudge[6] | fpJudge[7] | fpJudge[8] | fpJudge[9] | fpJudge[10] | fpJudge[11] |
-//                                   fpJudge[12] | fpJudge[13] | fpJudge[14] | fpJudge[15]);
-//             if (NMS_FAST_buf[i][j] == 0)
-//                 NMS_score_buf[i][j] = 0;
-
-//         }
-//     ap_uint<3> i = 1;
-//     for (ap_uint<8> j = 1; j < PROCESS_NUM + 1; j++) {
-// #pragma HLS unroll
-//         ap_uint<18> psum[6];
-// #pragma HLS ARRAY_PARTITION variable=psum complete dim=1
-//         psum[0] = ((win_buf_center(0, 2) + win_buf_center(0, 3)) + (win_buf_center(0, 4) + win_buf_center(6, 2))) +
-//                   ((win_buf_center(6, 3) + win_buf_center(6, 4)) + (win_buf_center(2, 6) + win_buf_center(3, 6))) +
-//                   ((win_buf_center(4, 6) + win_buf_center(2, 0)) + (win_buf_center(3, 0) + win_buf_center(4, 0)));
-//         psum[1] = (win_buf_center(1, 1) + win_buf_center(1, 5)) + (win_buf_center(5, 1) + win_buf_center(5, 5));
-//         psum[2] = ((win_buf_center(1, 2) + win_buf_center(1, 4)) + (win_buf_center(2, 1) + win_buf_center(4, 1))) +
-//                   ((win_buf_center(2, 5) + win_buf_center(4, 5)) + (win_buf_center(5, 2) + win_buf_center(5, 4)));
-//         psum[3] = (win_buf_center(1, 3) + win_buf_center(3, 1)) + (win_buf_center(5, 3) + win_buf_center(3, 5));
-//         psum[4] = (win_buf_center(2, 2) + win_buf_center(4, 2)) + (win_buf_center(2, 4) + win_buf_center(4, 4));
-//         psum[5] = (win_buf_center(2, 3) + win_buf_center(3, 2)) + (win_buf_center(4, 3) + win_buf_center(3, 4));
-
-//         ap_uint<18> S_psum[7];
-// #pragma HLS ARRAY_PARTITION variable=psum complete dim=1
-//         S_psum[0] = psum[0];
-//         S_psum[1] = psum[1] << 1;
-//         S_psum[2] = psum[2] + (psum[2] << 2);
-//         S_psum[3] = psum[3] + (psum[3] << 1) + (psum[3] << 2);
-//         S_psum[4] = psum[4] + (psum[4] << 2) + (psum[4] << 3);
-//         S_psum[5] = psum[5] + (psum[5] << 4);
-//         S_psum[6] = win_buf_center(3, 3) + (win_buf_center(3, 3) << 1) + (win_buf_center(3, 3) << 2) +
-//                     (win_buf_center(3, 3) << 4);
-
-//         ap_uint<18> simsim =
-//                 ((S_psum[0] + S_psum[1]) + (S_psum[2] + S_psum[3])) + ((S_psum[4] + S_psum[5]) + S_psum[6]);
-//         gaus_buf[j - 1] = (simsim >> 8).range(7, 0);
-
-//         ap_uint<1> scoreJudge[3][3];
-//         for (ap_uint<3> ii = i - 1; ii < i + 2; ii++) {
-// #pragma HLS unroll
-//             for (ap_uint<8> jj = j - 1; jj < j + 2; jj++) {
-// #pragma HLS unroll
-//                 scoreJudge[ii - i + 1][jj - j + 1] = (NMS_score_buf[ii][jj] >= NMS_score_buf[i][j]) ? 0 : 1;
-//             }
-//         }
-//         FAST_buf[j - 1].range(0, 0) =
-//                 NMS_FAST_buf[i][j] & scoreJudge[0][0] & scoreJudge[0][1] & scoreJudge[0][2] & scoreJudge[1][0] &
-//                 scoreJudge[1][2] & scoreJudge[2][0] & scoreJudge[2][1] & scoreJudge[2][2];
-//         FAST_buf[j - 1].range(7, 1) = NMS_score_buf[i][j];
-//     }
-// }
 void
 process_FAST(ap_uint<PIXEL_BIT> win_buf[WIN_SZ][WIN_SZ + PROCESS_NUM - 1], ap_uint<PIXEL_BIT> gaus_buf[PROCESS_NUM],
              ap_uint<PIXEL_BIT> FAST_buf[PROCESS_NUM],ap_uint<WIN_SZ_BIT> win_ind[WIN_SZ]) {

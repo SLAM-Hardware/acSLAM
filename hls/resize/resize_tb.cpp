@@ -93,8 +93,6 @@ int main()
 	{
 		for (int j = 0; j < new_width; j++)
 			 cout << new_img[i][j] << " ";
-//			if (new_img[i][j]!=img_gray[i][j])
-//				cout << "error" << endl;
 		 cout << endl;
 	}
 
