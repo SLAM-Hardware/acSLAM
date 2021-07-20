@@ -1,12 +1,12 @@
-#include "img_gray.h"
-#include "FAST.h"
+// #include "img_gray.h"
+// #include "FAST.h"
 #include "RS_BRIEF.h"
 #include <fstream>
 using namespace std;
 int main()
 {
 	ifstream ifile;
-	ifile.open("C:/slam/HLS_project/FAST_extractor/result.txt");
+	ifile.open("../../../../../FAST_extractor/result.txt");
 	int width, height;
 	ifile >> width;
 	ifile >> height;

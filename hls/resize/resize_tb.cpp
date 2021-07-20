@@ -97,7 +97,7 @@ int main()
 	}
 
 	ofstream ofile;
-	ofile.open("./result.txt");
+	ofile.open("../../../../result.txt");
 	ofile << new_width << endl;
 	ofile << new_height << endl;
 	for (int i = 0; i < new_height; i++)

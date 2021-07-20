@@ -1,11 +1,11 @@
-#include "img_gray.h"
+// #include "img_gray.h"
 #include "FAST.h"
 #include <fstream>
 using namespace std;
 int main()
 {
 	ifstream ifile;
-	ifile.open("C:/slam/HLS_project/resize/result.txt");
+	ifile.open("../../../../../resize/result.txt");
 	int width, height;
 	ifile >> width;
 	ifile >> height;
@@ -75,7 +75,7 @@ int main()
 	cnt = 0;
 
 	ofstream ofile;
-	ofile.open("./result.txt");
+	ofile.open("../../../../result.txt");
 	ofile << new_width << endl;
 	ofile << new_height << endl;
 	for (int row = 0; row < new_height; row++){
@@ -104,7 +104,7 @@ int main()
 	}
 	ofile.close();
 
-	ofile.open("./result_test.txt");
+	ofile.open("../../../../result_test.txt");
 	ofile << new_width << endl;
 	ofile << new_height << endl;
 	for (int i = 0; i < new_height; i++)

@@ -230,7 +230,7 @@ void process_buf(hls::stream<ap_uint<PROCESS_BIT> > &pixelData, hls::stream<ap_u
 #pragma HLS INLINE off
 
 	ap_uint<PIXEL_BIT * MERGE_NUM> image_buf[WIN_SZ][WIDTH_AFTER_MERGE];
-#pragma HLS ARRAY_PARTITION variable = image_buf cyclic factor = 2 dim = 2
+#pragma HLS ARRAY_PARTITION variable = image_buf cyclic factor = 4 dim = 2
 //#pragma HLS ARRAY_PARTITION variable = image_buf complete dim = 1
 #pragma HLS RESOURCE variable = image_buf core = RAM_2P_BRAM
 
@@ -255,7 +255,7 @@ void process_buf(hls::stream<ap_uint<PROCESS_BIT> > &pixelData, hls::stream<ap_u
 		win_ind[i] = i;
 
 //	for (ap_uint<WIDTH_BIT> col_ind = 0; col_ind < WIDTH_AFTER_MERGE; col_ind++)
-//#pragma HLS UNROLL factor = 8
+//#pragma HLS UNROLL factor = 4
 //#pragma HLS PIPELINE
 //		image_buf[WIN_SZ - 1][col_ind] = 0;
 //

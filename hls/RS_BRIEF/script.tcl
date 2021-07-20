@@ -16,7 +16,7 @@ create_clock -period 8 -name default
 config_sdx -target none
 config_export -format ip_catalog -rtl verilog -vivado_optimization_level 2 -vivado_phys_opt place -vivado_report_level 0
 #source "./RS_BRIEF/solution1/directives.tcl"
-csim_design -clean -O
+csim_design -O
 csynth_design
 cosim_design -O
 export_design -rtl verilog -format ip_catalog

@@ -664,7 +664,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
     ap_uint<PIXEL_BIT * MERGE_NUM> image_buf[WIN_SZ][WIDTH_AFTER_MERGE];
 #pragma HLS RESOURCE variable=image_buf core=RAM_T2P_BRAM
 //#pragma HLS BIND_STORAGE variable=image_buf type=ram_t2p impl=bram
-#pragma HLS ARRAY_PARTITION variable = image_buf cyclic factor = 2 dim = 2
+#pragma HLS ARRAY_PARTITION variable = image_buf cyclic factor = 1 dim = 2
 #pragma HLS ARRAY_PARTITION variable = image_buf block factor = 29 dim = 1
 
     ap_uint<PIXEL_BIT> win_buf[WIN_SZ][WIN_SZ + PROCESS_NUM - 1];
@@ -686,7 +686,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
         for (ap_uint<8> initInd = 0; initInd < (WIN_SZ - 1) / MERGE_NUM; initInd++)
         {
 #pragma HLS PIPELINE
-#pragma HLS UNROLL factor = 2
+#pragma HLS UNROLL factor = 1
             ap_uint<8> offset = initInd * PIXEL_BIT * MERGE_NUM;
             ap_uint<PIXEL_BIT * MERGE_NUM> pixelSplitTmp = pixelInitIn.range(PIXEL_BIT * MERGE_NUM - 1 + offset, 0 + offset);
             image_buf[row_ind][initInd] = pixelSplitTmp;
@@ -711,7 +711,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
        for (ap_uint<WIDTH_BIT> read_ind = 0;
            read_ind < padding_unit_num * INPUT_PIXEL_NUM / MERGE_NUM; read_ind++) {
 #pragma HLS DEPENDENCE variable=image_buf inter RAW false
-#pragma HLS UNROLL factor = 2
+#pragma HLS UNROLL factor = 1
 #pragma HLS PIPELINE
            ap_uint<PIXEL_BIT * MERGE_NUM> pixelCopyTmp = image_buf[WIN_SZ-row_ind-1][read_ind];
            image_buf[row_ind][read_ind] = pixelCopyTmp;
@@ -742,7 +742,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
             for (ap_uint<8> initInd = 0; initInd < (WIN_SZ - 1) / MERGE_NUM; initInd++)
             {
 #pragma HLS PIPELINE
-#pragma HLS UNROLL factor = 2
+#pragma HLS UNROLL factor = 1
                 ap_uint<8> offset = initInd * PIXEL_BIT * MERGE_NUM;
                 image_buf[win_ind[WIN_SZ - 1]][initInd] = 
                     pixelInitIn.range(PIXEL_BIT * MERGE_NUM - 1 + offset, 0 + offset);
@@ -752,7 +752,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
             for (ap_uint<8> initInd = 0; initInd < (WIN_SZ - 1) / MERGE_NUM; initInd++)
             {
 #pragma HLS PIPELINE
-#pragma HLS UNROLL factor = 2
+#pragma HLS UNROLL factor = 1
                 image_buf[win_ind[WIN_SZ - 1]][initInd] =
                		image_buf[win_ind[WIN_SZ-3-(row_ind-(height-HALF_WIN_SZ))*2]][initInd];
             }
@@ -796,7 +796,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
         for (ap_uint<8> initInd = 0; initInd < (WIN_SZ - 1) / MERGE_NUM; initInd++)
         {
 #pragma HLS PIPELINE
-#pragma HLS UNROLL factor = 2
+#pragma HLS UNROLL factor = 1
             ap_uint<8> offset = initInd * PIXEL_BIT * MERGE_NUM;
             image_buf[win_ind[WIN_SZ - 1]][initInd] = 
                 pixelInitIn.range(PIXEL_BIT * MERGE_NUM - 1 + offset, 0 + offset);
@@ -837,7 +837,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
         for (ap_uint<8> initInd = 0; initInd < (WIN_SZ - 1) / MERGE_NUM; initInd++)
         {
 #pragma HLS PIPELINE
-#pragma HLS UNROLL factor = 2
+#pragma HLS UNROLL factor = 1
             image_buf[win_ind[WIN_SZ - 1]][initInd] =
                 image_buf[win_ind[WIN_SZ-3-(row_ind-(height-HALF_WIN_SZ))*2]][initInd];
         }
@@ -874,7 +874,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
 #else
 
     for (ap_uint<WIDTH_BIT> col_ind = 0; col_ind < WIDTH_AFTER_MERGE; col_ind++)
-#pragma HLS UNROLL factor = 2
+#pragma HLS UNROLL factor = 1
 #pragma HLS PIPELINE
 		for (ap_uint<HEIGHT_BIT> row_ind = 0; row_ind < HALF_WIN_SZ; row_ind++)
 #pragma HLS UNROLL
@@ -885,7 +885,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
             for (ap_uint<8> initInd = 0; initInd < (WIN_SZ - 1) / MERGE_NUM; initInd++)
             {
 #pragma HLS PIPELINE
-#pragma HLS UNROLL factor = 2
+#pragma HLS UNROLL factor = 1
                 ap_uint<8> offset = initInd * PIXEL_BIT * MERGE_NUM;
                 image_buf[win_ind[WIN_SZ - 1]][initInd] = 
                     pixelInitIn.range(PIXEL_BIT * MERGE_NUM - 1 + offset, 0 + offset);
@@ -894,7 +894,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
             for (ap_uint<8> initInd = 0; initInd < (WIN_SZ - 1) / MERGE_NUM; initInd++)
             {
 #pragma HLS PIPELINE
-#pragma HLS UNROLL factor = 2
+#pragma HLS UNROLL factor = 1
                 image_buf[win_ind[WIN_SZ - 1]][initInd] = 0;
             }
         }
