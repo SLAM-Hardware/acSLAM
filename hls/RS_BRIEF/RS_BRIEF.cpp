@@ -665,7 +665,7 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &pixelInitData
 #pragma HLS RESOURCE variable=image_buf core=RAM_T2P_BRAM
 //#pragma HLS BIND_STORAGE variable=image_buf type=ram_t2p impl=bram
 #pragma HLS ARRAY_PARTITION variable = image_buf cyclic factor = 1 dim = 2
-#pragma HLS ARRAY_PARTITION variable = image_buf block factor = 29 dim = 1
+#pragma HLS ARRAY_PARTITION variable = image_buf complete dim = 1
 
     ap_uint<PIXEL_BIT> win_buf[WIN_SZ][WIN_SZ + PROCESS_NUM - 1];
 #pragma HLS ARRAY_PARTITION variable = win_buf complete dim = 0

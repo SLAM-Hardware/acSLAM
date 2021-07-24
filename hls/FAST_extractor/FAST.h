@@ -1,3 +1,11 @@
+/***************************************************************************
+Change the Parallelism
+1. Change INPUT_PIXEL_NUM to 4n (n=1,2,3...).
+2. Change READ_NUM to ceil((HALF_WIN_SZ + 1)/ INPUT_PIXEL_NUM).
+3. Change ARRAY_PARTITION and UNROLL factor in FAST_extractor.cpp. 
+   The factor is equal to INPUT_PIXEL_NUM/4.
+ ***************************************************************************/
+
 #ifndef FAST_H_
 #define FAST_H_
 
@@ -23,7 +31,7 @@ typedef unsigned char uchar_t;
 #define INPUT_BIT INPUT_PIXEL_NUM * PIXEL_BIT
 #define INPUT_PIXEL_NUM 4
 #define OUTPUT_BIT OUTPUT_PIXEL_NUM * PIXEL_BIT
-#define OUTPUT_PIXEL_NUM INPUT_PIXEL_NUM
+#define OUTPUT_PIXEL_NUM INPUT_PIXEL_NUM // equal to INPUT_PIXEL_NUM
 #define WIDTH 1241
 #define HEIGHT 376
 #define WIN_SZ 9
@@ -33,7 +41,7 @@ typedef unsigned char uchar_t;
 #define WIN_SZ_BIT 4
 #define PIXEL_NUM_BIT WIDTH_BIT + HEIGHT_BIT
 #define MAX_PIXEL_VAL 255
-#define PROCESS_NUM INPUT_PIXEL_NUM
+#define PROCESS_NUM INPUT_PIXEL_NUM // equal to INPUT_PIXEL_NUM
 #define PROCESS_BIT PROCESS_NUM * PIXEL_BIT
 #define MERGE_NUM 4
 #define WIDTH_AFTER_MERGE 313 // ceil((WIDTH + WIN_SZ - 1) / MERGE_NUM)

@@ -1,3 +1,10 @@
+/***************************************************************************
+Change the Parallelism
+1. Change INPUT_PIXEL_NUM to 4n (n=1,2,3...).
+2. Change ARRAY_PARTITION and UNROLL factor in resize.cpp. 
+   The factor is equal to INPUT_PIXEL_NUM/4.
+ ***************************************************************************/
+
 #ifndef RESIZE_H
 #define RESIZE_H
 
