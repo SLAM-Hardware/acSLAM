@@ -1,7 +1,7 @@
 # SLAM-Hardware
 FPGA Hardware Implementation for SLAM
 
-## How to rebuild project
+## How to Rebuild Project
 ### Step 1. Generate Vivado IP from HLS
 ```
 cd hls
