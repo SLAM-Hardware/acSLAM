@@ -21,6 +21,6 @@ vivado_hls -f script.tcl
 ```
 ### Step 2. Generate Heapsort IP
 ### Step 3. Rebuild the Vivado Project
-### Step 4. Building ORB-SLAM2
+### Step 4. Build ORB-SLAM2
 ### Step 5. TUM Example
 ### Step 6. KITTI Example
