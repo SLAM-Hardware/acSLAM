@@ -5,10 +5,8 @@
 ############################################################
 open_project RS_BRIEF
 set_top RS_BRIEF
-add_files ./FAST.h
 add_files ./RS_BRIEF.cpp
 add_files ./RS_BRIEF.h
-add_files ./img_gray.h
 add_files -tb ./tb_RS_BRIEF.cpp -cflags "-Wno-unknown-pragmas" -csimflags "-Wno-unknown-pragmas"
 open_solution "solution1"
 set_part {xczu7ev-ffvc1156-2-e}
