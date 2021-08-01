@@ -1,26 +1,6 @@
-# SLAM-Hardware
-FPGA Hardware Implementation for SLAM
+# acSLAM
 
-## How to Rebuild Project
-### Step 1. Generate Vivado IP from HLS
-```
-cd hls
+This project includes a complete acceleration scheme based on the ORB-SLAM2 algorithm, called acSLAM, including both front-end and back-end.
 
-cd resize
-vivado_hls -f script.tcl
-
-cd ..
-
-cd FAST_extractor
-vivado_hls -f script.tcl
-
-cd ..
-
-cd RS_BRIEF
-vivado_hls -f script.tcl
-```
-### Step 2. Generate Heapsort IP
-### Step 3. Rebuild the Vivado Project
-### Step 4. Build ORB-SLAM2
-### Step 5. TUM Example
-### Step 6. KITTI Example
+## Results on ZCU104 Board
+Compared  with  running  ORB-SLAM2  on  the  ARM processor, acSLAM achieves 2.1× and 2.7× faster in the TUM and KITTI datasets, while maintaining 10% error of SOTA eSLAM. In addition, the FPGA accelerated front-end achieves 4.55× and 40× faster than eSLAM and ARM. 
