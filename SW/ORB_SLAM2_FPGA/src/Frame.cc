@@ -76,8 +76,8 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 
     // ORB extraction
     thread threadLeft(&Frame::ExtractORB,this,0,imLeft);
-    thread threadRight(&Frame::ExtractORB,this,1,imRight);
     threadLeft.join();
+    thread threadRight(&Frame::ExtractORB,this,1,imRight);
     threadRight.join();
 
     N = mvKeys.size();
