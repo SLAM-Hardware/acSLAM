@@ -10,7 +10,7 @@ This project includes a complete acceleration scheme based on the ORB-SLAM2 algo
 ### System
 We implement ORB extractor and heapsort as specialized hardware modules, and combine with the CPU to realize a heterogeneous end-to-end system for ORB-SLAM2. The overall workflow of the system is shown below:
 
-![](data\overall_arch.png "Architecture")
+![](data/overall_arch.png "Architecture")
 
 
 ## Results on ZCU104 Board
