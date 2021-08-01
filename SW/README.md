@@ -2,7 +2,7 @@
 ## jupyter_notebooks
 This folder holds jupyter_notebook file and the .bit and .hwh files for PYNQ.
 
-Run code in ```<path-to-proj>/SW/jupyter_notebooks/ORB/ORB.ipynb``` to overlay the bitstream and test hardware.
+Run code in ```<path-to-proj>/SW/jupyter_notebooks/ORB/ORB.ipynb``` to overlay the bitstream and test the hardware.
 
 ## ORB_SLAM2_FPGA
 Please install the dependency library according to the https://github.com/raulmur/ORB_SLAM2 first.
