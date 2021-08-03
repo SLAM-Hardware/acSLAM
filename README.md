@@ -12,6 +12,13 @@ We implement ORB extractor and heapsort as specialized hardware modules, and com
 
 ![](data/overall_arch.png "Architecture")
 
+## Contents of each folder
+### HW
+The source files of hardware
+### SW
+Notebook run in Jupyter Notebook and source files of ORB-SLAM2
+### Vivado
+Script for constructing Vivado Block Design
 
 ## Results on ZCU104 Board
 ### 1.Resource Utilizaton
