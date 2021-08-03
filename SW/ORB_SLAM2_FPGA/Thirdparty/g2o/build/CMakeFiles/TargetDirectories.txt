@@ -1,3 +1,0 @@
-/home/xilinx/Packages/ORB_SLAM2_new_exp/Thirdparty/g2o/build/CMakeFiles/rebuild_cache.dir
-/home/xilinx/Packages/ORB_SLAM2_new_exp/Thirdparty/g2o/build/CMakeFiles/g2o.dir
-/home/xilinx/Packages/ORB_SLAM2_new_exp/Thirdparty/g2o/build/CMakeFiles/edit_cache.dir
