@@ -89,7 +89,7 @@ void process_scale_1(hls::stream<ap_axiu<INPUT_STREAM_BIT, 1, 1, 1> > &srcStream
 			for (ap_uint<8> i = 0; i < OUTPUT_BIT >> 3; i++)
 #pragma HLS UNROLL
 				out.keep.range(i, i) = 1;
-			if (p_cnt == new_width * new_height && rmn_num == 0)
+			if (p_cnt == width * height && rmn_num == 0)
 				out.last = 1;
 			else
 				out.last = 0;
@@ -115,7 +115,7 @@ void process_scale_1(hls::stream<ap_axiu<INPUT_STREAM_BIT, 1, 1, 1> > &srcStream
 				for (ap_uint<8> i = 0; i < OUTPUT_BIT >> 3; i++)
 #pragma HLS UNROLL
 					out.keep.range(i, i) = 1;
-				if (p_cnt == new_width * new_height && rmn_num == 0)
+				if (p_cnt == width * height && rmn_num == 0)
 					out.last = 1;
 				else
 					out.last = 0;
