@@ -83,6 +83,7 @@ void process_scale_1(hls::stream<ap_axiu<INPUT_STREAM_BIT, 1, 1, 1> > &srcStream
 #pragma HLS DEPENDENCE variable=read_ind intra RAW false
 #pragma HLS PIPELINE
 		if (rmn_num >= OUTPUT_PIXEL_NUM)
+		// if the remaining number of pixels in this module is greater than OUTPUT_PIXEL_NUM
 		{
 			rmn_num = rmn_num - OUTPUT_PIXEL_NUM;
 			out.data = write_tmp;
