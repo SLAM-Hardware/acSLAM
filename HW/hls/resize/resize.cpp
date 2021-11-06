@@ -162,16 +162,16 @@ void process(hls::stream<ap_axiu<INPUT_STREAM_BIT, 1, 1, 1> > &srcStream, hls::s
 	process_select(outData, selectData);
 	process_output(selectData, outStream);
 #ifdef DEBUG
-	// for (int i = 0; i < height-1; i++)
-	// {
-	// 	for (int j = 0; j < 1; j++)
-	// 	{
-	// 		ap_uint<INPUT_BIT> data = outData.read();
-	// 		for (int read_ind = 0; read_ind<PROCESS_NUM; read_ind++)
-	// 			cout << data.range((read_ind+1)*PIXEL_BIT-1,read_ind*PIXEL_BIT) << " ";
-	// 	}
-	// 	cout << endl;
-	// }
+	for (int i = 0; i < height-1; i++)
+	{
+		for (int j = 0; j < 1; j++)
+		{
+			ap_uint<INPUT_BIT> data = outData.read();
+			for (int read_ind = 0; read_ind<PROCESS_NUM; read_ind++)
+				cout << data.range((read_ind+1)*PIXEL_BIT-1,read_ind*PIXEL_BIT) << " ";
+		}
+		cout << endl;
+	}
 #endif
 }
 
