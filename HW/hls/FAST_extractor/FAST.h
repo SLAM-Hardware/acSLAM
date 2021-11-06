@@ -58,29 +58,29 @@ void FAST(hls::stream<ap_axiu<32, 1, 1, 1> > &cfgStream, hls::stream<ap_axiu<INP
 template <class T, int W, int I>
 T my_round(T x)
 {
-	T tmp = x;
-	if (x.range(W - I - 1, W - I - 1) == 1)
-		tmp.range(W - 1, W - I) = tmp.range(W - 1, W - I) + 1;
-	tmp.range(W - I - 1, 0) = 0;
-	return tmp;
+    T tmp = x;
+    if (x.range(W - I - 1, W - I - 1) == 1)
+        tmp.range(W - 1, W - I) = tmp.range(W - 1, W - I) + 1;
+    tmp.range(W - I - 1, 0) = 0;
+    return tmp;
 }
 
 template <class T, int W, int I>
 T my_ceil(T x)
 {
-	T tmp = x;
-	if (x.range(W - I - 1, 0) != 0)
-		tmp.range(W - 1, W - I) = tmp.range(W - 1, W - I) + 1;
-	tmp.range(W - I - 1, 0) = 0;
-	return tmp;
+    T tmp = x;
+    if (x.range(W - I - 1, 0) != 0)
+        tmp.range(W - 1, W - I) = tmp.range(W - 1, W - I) + 1;
+    tmp.range(W - I - 1, 0) = 0;
+    return tmp;
 }
 
 template <class T, int W, int I>
 T my_floor(T x)
 {
-	T tmp = x;
-	tmp.range(W - I - 1, 0) = 0;
-	return tmp;
+    T tmp = x;
+    tmp.range(W - I - 1, 0) = 0;
+    return tmp;
 }
 
 #endif

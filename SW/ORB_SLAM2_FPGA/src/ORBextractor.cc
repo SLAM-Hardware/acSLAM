@@ -1046,68 +1046,70 @@ static void computeDescriptors(const Mat& image, vector<KeyPoint>& keypoints, Ma
 void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPoint>& _keypoints,
                       OutputArray _descriptors)
 { 
-    // if(_image.empty())
-    //     return;
+#ifdef SOFTWARE_RUN
+    if(_image.empty())
+        return;
 
-    // Mat image = _image.getMat();
-    // assert(image.type() == CV_8UC1 );
+    Mat image = _image.getMat();
+    assert(image.type() == CV_8UC1 );
 
-    // // Pre-compute the scale pyramid
-    // ComputePyramid(image);
+    // Pre-compute the scale pyramid
+    ComputePyramid(image);
 
-    // vector < vector<KeyPoint> > allKeypoints;
-    // ComputeKeyPointsOctTree(allKeypoints);
-    // //ComputeKeyPointsOld(allKeypoints);
+    vector < vector<KeyPoint> > allKeypoints;
+    ComputeKeyPointsOctTree(allKeypoints);
+    //ComputeKeyPointsOld(allKeypoints);
 
-    // Mat descriptors;
+    Mat descriptors;
 
-    // int nkeypoints = 0;
-    // for (int level = 0; level < nlevels; ++level)
-    //     nkeypoints += (int)allKeypoints[level].size();
-    // if( nkeypoints == 0 )
-    //     _descriptors.release();
-    // else
-    // {
-    //     _descriptors.create(nkeypoints, 32, CV_8U);
-    //     descriptors = _descriptors.getMat();
-    // }
+    int nkeypoints = 0;
+    for (int level = 0; level < nlevels; ++level)
+        nkeypoints += (int)allKeypoints[level].size();
+    if( nkeypoints == 0 )
+        _descriptors.release();
+    else
+    {
+        _descriptors.create(nkeypoints, 32, CV_8U);
+        descriptors = _descriptors.getMat();
+    }
 
-    // _keypoints.clear();
-    // _keypoints.reserve(nkeypoints);
+    _keypoints.clear();
+    _keypoints.reserve(nkeypoints);
 
-    // int offset = 0;
-    // for (int level = 0; level < nlevels; ++level)
-    // {
-    //     vector<KeyPoint>& keypoints = allKeypoints[level];
-    //     int nkeypointsLevel = (int)keypoints.size();
+    int offset = 0;
+    for (int level = 0; level < nlevels; ++level)
+    {
+        vector<KeyPoint>& keypoints = allKeypoints[level];
+        int nkeypointsLevel = (int)keypoints.size();
 
-    //     if(nkeypointsLevel==0)
-    //         continue;
+        if(nkeypointsLevel==0)
+            continue;
 
-    //     // preprocess the resized image
-    //     Mat workingMat = mvImagePyramid[level].clone();
-    //     GaussianBlur(workingMat, workingMat, Size(7, 7), 2, 2, BORDER_REFLECT_101);
+        // preprocess the resized image
+        Mat workingMat = mvImagePyramid[level].clone();
+        GaussianBlur(workingMat, workingMat, Size(7, 7), 2, 2, BORDER_REFLECT_101);
 
-    //     // Compute the descriptors
-    //     Mat desc = descriptors.rowRange(offset, offset + nkeypointsLevel);
-    //     computeDescriptors(workingMat, keypoints, desc, pattern);
+        // Compute the descriptors
+        Mat desc = descriptors.rowRange(offset, offset + nkeypointsLevel);
+        computeDescriptors(workingMat, keypoints, desc, pattern);
 
-    //     offset += nkeypointsLevel;
+        offset += nkeypointsLevel;
 
-    //     // Scale keypoint coordinates
-    //     if (level != 0)
-    //     {
-    //         float scale = mvScaleFactor[level]; //getScale(level, firstLevel, scaleFactor);
-    //         for (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
-    //              keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint)
-    //             keypoint->pt *= scale;
-    //     }
-    //     // And add the keypoints to the output
-    //     _keypoints.insert(_keypoints.end(), keypoints.begin(), keypoints.end());
-    // }
-    // ofstream ofile, oimg;
-    // ofile.open("/home/xilinx/Packages/ORB_SLAM2_new_exp/extractor_log.txt");
-    // oimg.open("/home/xilinx/Packages/ORB_SLAM2_new_exp/wrong_img.txt");
+        // Scale keypoint coordinates
+        if (level != 0)
+        {
+            float scale = mvScaleFactor[level]; //getScale(level, firstLevel, scaleFactor);
+            for (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
+                 keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint)
+                keypoint->pt *= scale;
+        }
+        // And add the keypoints to the output
+        _keypoints.insert(_keypoints.end(), keypoints.begin(), keypoints.end());
+    }
+    ofstream ofile, oimg;
+    ofile.open("/home/xilinx/Packages/ORB_SLAM2_new_exp/extractor_log.txt");
+    oimg.open("/home/xilinx/Packages/ORB_SLAM2_new_exp/wrong_img.txt");
+#else
     if(_image.empty())
         return;
 
@@ -1195,10 +1197,10 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
             }
             
             //if (scale * Kp[3] <= image.cols - 1 || scale * Kp[2] <= image.rows - 1)
-                if (Kp[3]!=0 && Kp[2] != 0){
-                    levelKeypoints.push_back(Kp);
-                    kp_ind++;
-                }
+            if (Kp[3]!=0 && Kp[2] != 0){
+                levelKeypoints.push_back(Kp);
+                kp_ind++;
+            }
             it_ind--;
         }
         // printf("Kp ready\n");
@@ -1261,6 +1263,7 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
     cma_free(addrptr_data_out);
     // ofile << "exit" <<endl;
     // ofile.close();
+#endif
 }
 
 void ORBextractor::ComputePyramid(cv::Mat image)
