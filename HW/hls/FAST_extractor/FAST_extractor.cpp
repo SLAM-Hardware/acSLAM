@@ -667,6 +667,142 @@ void process_buf(hls::stream <ap_uint<(WIN_SZ - 1) * PIXEL_BIT> > &initData,
 #endif
 }
 
+void single_loop(ap_uint<3> row_ind, ap_uint<PIXEL_BIT> win_buf[WIN_SZ][WIN_SZ + PROCESS_NUM - 1], ap_uint<8> NMS_score_buf[3][PROCESS_NUM + 2], ap_uint<1> NMS_FAST_buf[3][PROCESS_NUM + 2], ap_uint<WIN_SZ_BIT> win_ind[WIN_SZ])
+{
+#pragma HLS INLINE
+#define win_buf_center(x, y) win_buf[win_ind[x+i]][y+j]
+    for (ap_uint<11> loop_ind = (2 + PROCESS_NUM)*row_ind; loop_ind < (2 + PROCESS_NUM)*(row_ind+1); loop_ind++) {
+#pragma HLS UNROLL
+        ap_uint<3> i = loop_ind / (2 + PROCESS_NUM);
+        ap_uint<8> j = loop_ind - i*(2 + PROCESS_NUM);
+        short int diff[25];
+#pragma HLS ARRAY_PARTITION variable=diff complete dim=1
+
+        diff[0] = win_buf_center(3, 3) - win_buf_center(0, 3);
+        diff[1] = win_buf_center(3, 3) - win_buf_center(0, 4);
+        diff[2] = win_buf_center(3, 3) - win_buf_center(1, 5);
+        diff[3] = win_buf_center(3, 3) - win_buf_center(2, 6);
+        diff[4] = win_buf_center(3, 3) - win_buf_center(3, 6);
+        diff[5] = win_buf_center(3, 3) - win_buf_center(4, 6);
+        diff[6] = win_buf_center(3, 3) - win_buf_center(5, 5);
+        diff[7] = win_buf_center(3, 3) - win_buf_center(6, 4);
+        diff[8] = win_buf_center(3, 3) - win_buf_center(6, 3);
+        diff[9] = win_buf_center(3, 3) - win_buf_center(6, 2);
+        diff[10] = win_buf_center(3, 3) - win_buf_center(5, 1);
+        diff[11] = win_buf_center(3, 3) - win_buf_center(4, 0);
+        diff[12] = win_buf_center(3, 3) - win_buf_center(3, 0);
+        diff[13] = win_buf_center(3, 3) - win_buf_center(2, 0);
+        diff[14] = win_buf_center(3, 3) - win_buf_center(1, 1);
+        diff[15] = win_buf_center(3, 3) - win_buf_center(0, 2);
+
+        diff[16] = diff[0];
+        diff[17] = diff[1];
+        diff[18] = diff[2];
+        diff[19] = diff[3];
+        diff[20] = diff[4];
+        diff[21] = diff[5];
+        diff[22] = diff[6];
+        diff[23] = diff[7];
+        diff[24] = diff[8];
+
+        short int flag_d_min2[NUM - 1];
+        short int flag_d_max2[NUM - 1];
+        short int flag_d_min4[NUM - 3];
+        short int flag_d_max4[NUM - 3];
+        short int flag_d_min8[NUM - 7];
+        short int flag_d_max8[NUM - 7];
+
+        for (ap_uint<5> i = 0; i < NUM - 1; i++) {
+#pragma HLS UNROLL
+            flag_d_min2[i] = __MIN(diff[i], diff[i + 1]);
+            flag_d_max2[i] = __MAX(diff[i], diff[i + 1]);
+        }
+
+        for (ap_uint<5> i = 0; i < NUM - 3; i++) {
+#pragma HLS UNROLL
+            flag_d_min4[i] = __MIN(flag_d_min2[i], flag_d_min2[i + 2]);
+            flag_d_max4[i] = __MAX(flag_d_max2[i], flag_d_max2[i + 2]);
+        }
+
+        for (ap_uint<5> i = 0; i < NUM - 7; i++) {
+#pragma HLS UNROLL
+            flag_d_min8[i] = __MIN(flag_d_min4[i], flag_d_min4[i + 4]);
+            flag_d_max8[i] = __MAX(flag_d_max4[i], flag_d_max4[i + 4]);
+        }
+
+        uchar_t a0 = THRESHOLD;
+
+        for (ap_uint<5> i = 0; i < PSize; i += 2) {
+#pragma HLS UNROLL
+            short int a = 255;
+            if (PSize == 16) {
+                a = flag_d_min8[i + 1];
+            }
+            //		else {
+            //			for(ap_uint<5> j=1;j<PSize/2+1;j++)
+            //			{
+            //				a=__MIN(a,flag_d[i+j]);
+            //			}
+            //		}
+            a0 = __MAX(a0, __MIN(a, diff[i])); // a0 >= THRESHOLD
+            a0 = __MAX(a0, __MIN(a, diff[i + PSize / 2 + 1]));
+        }
+        short int b0 = -THRESHOLD;
+        for (ap_uint<5> i = 0; i < PSize; i += 2) {
+#pragma HLS UNROLL
+            short int b = -255;
+            if (PSize == 16) {
+                b = flag_d_max8[i + 1];
+            }
+            //		} else {
+            //			for(ap_uint<5> j=1;j<PSize/2+1;j++)
+            //			{
+            //				b=__MAX(b,flag_d[i+j]);
+            //			}
+            //		}
+            b0 = __MIN(b0, __MAX(b, diff[i])); // b0 <= -THRESHOLD
+            b0 = __MIN(b0, __MAX(b, diff[i + PSize / 2 + 1]));
+        }
+        NMS_score_buf[i][j] = __MAX(a0, -b0) - 1;
+
+
+        ap_uint<1> posJudge[24];
+#pragma HLS ARRAY_PARTITION variable=posJudge complete dim=1
+        ap_uint<1> negJudge[24];
+#pragma HLS ARRAY_PARTITION variable=negJudge complete dim=1
+
+        for (ap_uint<5> ii = 0; ii < 16; ii++) {
+#pragma HLS unroll
+            posJudge[ii] = (diff[ii] > THRESHOLD) ? 1 : 0;
+            negJudge[ii] = (diff[ii] < -THRESHOLD) ? 1 : 0;
+        }
+
+
+        for (ap_uint<5> ii = 0; ii < 8; ii++) {
+#pragma HLS unroll
+            posJudge[ii + 16] = (diff[ii] > THRESHOLD) ? 1 : 0;
+            negJudge[ii + 16] = (diff[ii] < -THRESHOLD) ? 1 : 0;
+        }
+
+
+        ap_uint<1> fpJudge[16];
+#pragma HLS ARRAY_PARTITION variable=fpJudge complete dim=1
+        for (ap_uint<5> ii = 0; ii < 16; ii++) {
+#pragma HLS unroll
+            fpJudge[ii] =
+                    (posJudge[ii] & posJudge[ii + 1] & posJudge[ii + 2] & posJudge[ii + 3] & posJudge[ii + 4] &
+                        posJudge[ii + 5] & posJudge[ii + 6] & posJudge[ii + 7] & posJudge[ii + 8]) |
+                    (negJudge[ii] & negJudge[ii + 1] & negJudge[ii + 2] & negJudge[ii + 3] & negJudge[ii + 4] &
+                        negJudge[ii + 5] & negJudge[ii + 6] & negJudge[ii + 7] & negJudge[ii + 8]);
+        }
+        NMS_FAST_buf[i][j] = (fpJudge[0] | fpJudge[1] | fpJudge[2] | fpJudge[3] | fpJudge[4] | fpJudge[5] |
+                                fpJudge[6] | fpJudge[7] | fpJudge[8] | fpJudge[9] | fpJudge[10] | fpJudge[11] |
+                                fpJudge[12] | fpJudge[13] | fpJudge[14] | fpJudge[15]);
+        if (NMS_FAST_buf[i][j] == 0)
+            NMS_score_buf[i][j] = 0;
+    }
+}
+
 void
 process_FAST(ap_uint<PIXEL_BIT> win_buf[WIN_SZ][WIN_SZ + PROCESS_NUM - 1], ap_uint<PIXEL_BIT> gaus_buf[PROCESS_NUM],
              ap_uint<PIXEL_BIT> FAST_buf[PROCESS_NUM],ap_uint<WIN_SZ_BIT> win_ind[WIN_SZ]) {
@@ -676,402 +812,9 @@ process_FAST(ap_uint<PIXEL_BIT> win_buf[WIN_SZ][WIN_SZ + PROCESS_NUM - 1], ap_ui
 #pragma HLS ARRAY_PARTITION variable = NMS_score_buf complete dim = 0
     ap_uint<1> NMS_FAST_buf[3][PROCESS_NUM + 2];
 #pragma HLS ARRAY_PARTITION variable = NMS_FAST_buf complete dim = 0
-        for (ap_uint<11> loop_ind = 0; loop_ind < (2 + PROCESS_NUM); loop_ind++) {
-#pragma HLS UNROLL
-            ap_uint<3> i = loop_ind / (2 + PROCESS_NUM);
-            ap_uint<8> j = loop_ind - i*(2 + PROCESS_NUM);
-            short int diff[25];
-#pragma HLS ARRAY_PARTITION variable=diff complete dim=1
-
-            diff[0] = win_buf_center(3, 3) - win_buf_center(0, 3);
-            diff[1] = win_buf_center(3, 3) - win_buf_center(0, 4);
-            diff[2] = win_buf_center(3, 3) - win_buf_center(1, 5);
-            diff[3] = win_buf_center(3, 3) - win_buf_center(2, 6);
-            diff[4] = win_buf_center(3, 3) - win_buf_center(3, 6);
-            diff[5] = win_buf_center(3, 3) - win_buf_center(4, 6);
-            diff[6] = win_buf_center(3, 3) - win_buf_center(5, 5);
-            diff[7] = win_buf_center(3, 3) - win_buf_center(6, 4);
-            diff[8] = win_buf_center(3, 3) - win_buf_center(6, 3);
-            diff[9] = win_buf_center(3, 3) - win_buf_center(6, 2);
-            diff[10] = win_buf_center(3, 3) - win_buf_center(5, 1);
-            diff[11] = win_buf_center(3, 3) - win_buf_center(4, 0);
-            diff[12] = win_buf_center(3, 3) - win_buf_center(3, 0);
-            diff[13] = win_buf_center(3, 3) - win_buf_center(2, 0);
-            diff[14] = win_buf_center(3, 3) - win_buf_center(1, 1);
-            diff[15] = win_buf_center(3, 3) - win_buf_center(0, 2);
-
-            diff[16] = diff[0];
-            diff[17] = diff[1];
-            diff[18] = diff[2];
-            diff[19] = diff[3];
-            diff[20] = diff[4];
-            diff[21] = diff[5];
-            diff[22] = diff[6];
-            diff[23] = diff[7];
-            diff[24] = diff[8];
-
-            short int flag_d_min2[NUM - 1];
-            short int flag_d_max2[NUM - 1];
-            short int flag_d_min4[NUM - 3];
-            short int flag_d_max4[NUM - 3];
-            short int flag_d_min8[NUM - 7];
-            short int flag_d_max8[NUM - 7];
-
-            for (ap_uint<5> i = 0; i < NUM - 1; i++) {
-#pragma HLS UNROLL
-                flag_d_min2[i] = __MIN(diff[i], diff[i + 1]);
-                flag_d_max2[i] = __MAX(diff[i], diff[i + 1]);
-            }
-
-            for (ap_uint<5> i = 0; i < NUM - 3; i++) {
-#pragma HLS UNROLL
-                flag_d_min4[i] = __MIN(flag_d_min2[i], flag_d_min2[i + 2]);
-                flag_d_max4[i] = __MAX(flag_d_max2[i], flag_d_max2[i + 2]);
-            }
-
-            for (ap_uint<5> i = 0; i < NUM - 7; i++) {
-#pragma HLS UNROLL
-                flag_d_min8[i] = __MIN(flag_d_min4[i], flag_d_min4[i + 4]);
-                flag_d_max8[i] = __MAX(flag_d_max4[i], flag_d_max4[i + 4]);
-            }
-
-            uchar_t a0 = THRESHOLD;
-
-            for (ap_uint<5> i = 0; i < PSize; i += 2) {
-#pragma HLS UNROLL
-                short int a = 255;
-                if (PSize == 16) {
-                    a = flag_d_min8[i + 1];
-                }
-                //		else {
-                //			for(ap_uint<5> j=1;j<PSize/2+1;j++)
-                //			{
-                //				a=__MIN(a,flag_d[i+j]);
-                //			}
-                //		}
-                a0 = __MAX(a0, __MIN(a, diff[i])); // a0 >= THRESHOLD
-                a0 = __MAX(a0, __MIN(a, diff[i + PSize / 2 + 1]));
-            }
-            short int b0 = -THRESHOLD;
-            for (ap_uint<5> i = 0; i < PSize; i += 2) {
-#pragma HLS UNROLL
-                short int b = -255;
-                if (PSize == 16) {
-                    b = flag_d_max8[i + 1];
-                }
-                //		} else {
-                //			for(ap_uint<5> j=1;j<PSize/2+1;j++)
-                //			{
-                //				b=__MAX(b,flag_d[i+j]);
-                //			}
-                //		}
-                b0 = __MIN(b0, __MAX(b, diff[i])); // b0 <= -THRESHOLD
-                b0 = __MIN(b0, __MAX(b, diff[i + PSize / 2 + 1]));
-            }
-            NMS_score_buf[i][j] = __MAX(a0, -b0) - 1;
-
-
-            ap_uint<1> posJudge[24];
-#pragma HLS ARRAY_PARTITION variable=posJudge complete dim=1
-            ap_uint<1> negJudge[24];
-#pragma HLS ARRAY_PARTITION variable=negJudge complete dim=1
-
-            for (ap_uint<5> ii = 0; ii < 16; ii++) {
-#pragma HLS unroll
-                posJudge[ii] = (diff[ii] > THRESHOLD) ? 1 : 0;
-                negJudge[ii] = (diff[ii] < -THRESHOLD) ? 1 : 0;
-            }
-
-
-            for (ap_uint<5> ii = 0; ii < 8; ii++) {
-#pragma HLS unroll
-                posJudge[ii + 16] = (diff[ii] > THRESHOLD) ? 1 : 0;
-                negJudge[ii + 16] = (diff[ii] < -THRESHOLD) ? 1 : 0;
-            }
-
-
-            ap_uint<1> fpJudge[16];
-#pragma HLS ARRAY_PARTITION variable=fpJudge complete dim=1
-            for (ap_uint<5> ii = 0; ii < 16; ii++) {
-#pragma HLS unroll
-                fpJudge[ii] =
-                        (posJudge[ii] & posJudge[ii + 1] & posJudge[ii + 2] & posJudge[ii + 3] & posJudge[ii + 4] &
-                         posJudge[ii + 5] & posJudge[ii + 6] & posJudge[ii + 7] & posJudge[ii + 8]) |
-                        (negJudge[ii] & negJudge[ii + 1] & negJudge[ii + 2] & negJudge[ii + 3] & negJudge[ii + 4] &
-                         negJudge[ii + 5] & negJudge[ii + 6] & negJudge[ii + 7] & negJudge[ii + 8]);
-            }
-            NMS_FAST_buf[i][j] = (fpJudge[0] | fpJudge[1] | fpJudge[2] | fpJudge[3] | fpJudge[4] | fpJudge[5] |
-                                  fpJudge[6] | fpJudge[7] | fpJudge[8] | fpJudge[9] | fpJudge[10] | fpJudge[11] |
-                                  fpJudge[12] | fpJudge[13] | fpJudge[14] | fpJudge[15]);
-            if (NMS_FAST_buf[i][j] == 0)
-                NMS_score_buf[i][j] = 0;
-
-        }
-        ///////////////////////////
-        for (ap_uint<11> loop_ind = 2 + PROCESS_NUM; loop_ind < (2 + PROCESS_NUM)*2; loop_ind++) {
-#pragma HLS UNROLL
-            ap_uint<3> i = loop_ind / (2 + PROCESS_NUM);
-            ap_uint<8> j = loop_ind - i*(2 + PROCESS_NUM);
-            short int diff[25];
-#pragma HLS ARRAY_PARTITION variable=diff complete dim=1
-
-            diff[0] = win_buf_center(3, 3) - win_buf_center(0, 3);
-            diff[1] = win_buf_center(3, 3) - win_buf_center(0, 4);
-            diff[2] = win_buf_center(3, 3) - win_buf_center(1, 5);
-            diff[3] = win_buf_center(3, 3) - win_buf_center(2, 6);
-            diff[4] = win_buf_center(3, 3) - win_buf_center(3, 6);
-            diff[5] = win_buf_center(3, 3) - win_buf_center(4, 6);
-            diff[6] = win_buf_center(3, 3) - win_buf_center(5, 5);
-            diff[7] = win_buf_center(3, 3) - win_buf_center(6, 4);
-            diff[8] = win_buf_center(3, 3) - win_buf_center(6, 3);
-            diff[9] = win_buf_center(3, 3) - win_buf_center(6, 2);
-            diff[10] = win_buf_center(3, 3) - win_buf_center(5, 1);
-            diff[11] = win_buf_center(3, 3) - win_buf_center(4, 0);
-            diff[12] = win_buf_center(3, 3) - win_buf_center(3, 0);
-            diff[13] = win_buf_center(3, 3) - win_buf_center(2, 0);
-            diff[14] = win_buf_center(3, 3) - win_buf_center(1, 1);
-            diff[15] = win_buf_center(3, 3) - win_buf_center(0, 2);
-
-            diff[16] = diff[0];
-            diff[17] = diff[1];
-            diff[18] = diff[2];
-            diff[19] = diff[3];
-            diff[20] = diff[4];
-            diff[21] = diff[5];
-            diff[22] = diff[6];
-            diff[23] = diff[7];
-            diff[24] = diff[8];
-
-            short int flag_d_min2[NUM - 1];
-            short int flag_d_max2[NUM - 1];
-            short int flag_d_min4[NUM - 3];
-            short int flag_d_max4[NUM - 3];
-            short int flag_d_min8[NUM - 7];
-            short int flag_d_max8[NUM - 7];
-
-            for (ap_uint<5> i = 0; i < NUM - 1; i++) {
-#pragma HLS UNROLL
-                flag_d_min2[i] = __MIN(diff[i], diff[i + 1]);
-                flag_d_max2[i] = __MAX(diff[i], diff[i + 1]);
-            }
-
-            for (ap_uint<5> i = 0; i < NUM - 3; i++) {
-#pragma HLS UNROLL
-                flag_d_min4[i] = __MIN(flag_d_min2[i], flag_d_min2[i + 2]);
-                flag_d_max4[i] = __MAX(flag_d_max2[i], flag_d_max2[i + 2]);
-            }
-
-            for (ap_uint<5> i = 0; i < NUM - 7; i++) {
-#pragma HLS UNROLL
-                flag_d_min8[i] = __MIN(flag_d_min4[i], flag_d_min4[i + 4]);
-                flag_d_max8[i] = __MAX(flag_d_max4[i], flag_d_max4[i + 4]);
-            }
-
-            uchar_t a0 = THRESHOLD;
-
-            for (ap_uint<5> i = 0; i < PSize; i += 2) {
-#pragma HLS UNROLL
-                short int a = 255;
-                if (PSize == 16) {
-                    a = flag_d_min8[i + 1];
-                }
-                //		else {
-                //			for(ap_uint<5> j=1;j<PSize/2+1;j++)
-                //			{
-                //				a=__MIN(a,flag_d[i+j]);
-                //			}
-                //		}
-                a0 = __MAX(a0, __MIN(a, diff[i])); // a0 >= THRESHOLD
-                a0 = __MAX(a0, __MIN(a, diff[i + PSize / 2 + 1]));
-            }
-            short int b0 = -THRESHOLD;
-            for (ap_uint<5> i = 0; i < PSize; i += 2) {
-#pragma HLS UNROLL
-                short int b = -255;
-                if (PSize == 16) {
-                    b = flag_d_max8[i + 1];
-                }
-                //		} else {
-                //			for(ap_uint<5> j=1;j<PSize/2+1;j++)
-                //			{
-                //				b=__MAX(b,flag_d[i+j]);
-                //			}
-                //		}
-                b0 = __MIN(b0, __MAX(b, diff[i])); // b0 <= -THRESHOLD
-                b0 = __MIN(b0, __MAX(b, diff[i + PSize / 2 + 1]));
-            }
-            NMS_score_buf[i][j] = __MAX(a0, -b0) - 1;
-
-
-            ap_uint<1> posJudge[24];
-#pragma HLS ARRAY_PARTITION variable=posJudge complete dim=1
-            ap_uint<1> negJudge[24];
-#pragma HLS ARRAY_PARTITION variable=negJudge complete dim=1
-
-            for (ap_uint<5> ii = 0; ii < 16; ii++) {
-#pragma HLS unroll
-                posJudge[ii] = (diff[ii] > THRESHOLD) ? 1 : 0;
-                negJudge[ii] = (diff[ii] < -THRESHOLD) ? 1 : 0;
-            }
-
-
-            for (ap_uint<5> ii = 0; ii < 8; ii++) {
-#pragma HLS unroll
-                posJudge[ii + 16] = (diff[ii] > THRESHOLD) ? 1 : 0;
-                negJudge[ii + 16] = (diff[ii] < -THRESHOLD) ? 1 : 0;
-            }
-
-
-            ap_uint<1> fpJudge[16];
-#pragma HLS ARRAY_PARTITION variable=fpJudge complete dim=1
-            for (ap_uint<5> ii = 0; ii < 16; ii++) {
-#pragma HLS unroll
-                fpJudge[ii] =
-                        (posJudge[ii] & posJudge[ii + 1] & posJudge[ii + 2] & posJudge[ii + 3] & posJudge[ii + 4] &
-                         posJudge[ii + 5] & posJudge[ii + 6] & posJudge[ii + 7] & posJudge[ii + 8]) |
-                        (negJudge[ii] & negJudge[ii + 1] & negJudge[ii + 2] & negJudge[ii + 3] & negJudge[ii + 4] &
-                         negJudge[ii + 5] & negJudge[ii + 6] & negJudge[ii + 7] & negJudge[ii + 8]);
-            }
-            NMS_FAST_buf[i][j] = (fpJudge[0] | fpJudge[1] | fpJudge[2] | fpJudge[3] | fpJudge[4] | fpJudge[5] |
-                                  fpJudge[6] | fpJudge[7] | fpJudge[8] | fpJudge[9] | fpJudge[10] | fpJudge[11] |
-                                  fpJudge[12] | fpJudge[13] | fpJudge[14] | fpJudge[15]);
-            if (NMS_FAST_buf[i][j] == 0)
-                NMS_score_buf[i][j] = 0;
-
-        }
-        ///////////////////////////
-        for (ap_uint<11> loop_ind = (2 + PROCESS_NUM)*2; loop_ind < (2 + PROCESS_NUM)*3; loop_ind++) {
-#pragma HLS UNROLL
-            ap_uint<3> i = loop_ind / (2 + PROCESS_NUM);
-            ap_uint<8> j = loop_ind - i*(2 + PROCESS_NUM);
-            short int diff[25];
-#pragma HLS ARRAY_PARTITION variable=diff complete dim=1
-
-            diff[0] = win_buf_center(3, 3) - win_buf_center(0, 3);
-            diff[1] = win_buf_center(3, 3) - win_buf_center(0, 4);
-            diff[2] = win_buf_center(3, 3) - win_buf_center(1, 5);
-            diff[3] = win_buf_center(3, 3) - win_buf_center(2, 6);
-            diff[4] = win_buf_center(3, 3) - win_buf_center(3, 6);
-            diff[5] = win_buf_center(3, 3) - win_buf_center(4, 6);
-            diff[6] = win_buf_center(3, 3) - win_buf_center(5, 5);
-            diff[7] = win_buf_center(3, 3) - win_buf_center(6, 4);
-            diff[8] = win_buf_center(3, 3) - win_buf_center(6, 3);
-            diff[9] = win_buf_center(3, 3) - win_buf_center(6, 2);
-            diff[10] = win_buf_center(3, 3) - win_buf_center(5, 1);
-            diff[11] = win_buf_center(3, 3) - win_buf_center(4, 0);
-            diff[12] = win_buf_center(3, 3) - win_buf_center(3, 0);
-            diff[13] = win_buf_center(3, 3) - win_buf_center(2, 0);
-            diff[14] = win_buf_center(3, 3) - win_buf_center(1, 1);
-            diff[15] = win_buf_center(3, 3) - win_buf_center(0, 2);
-
-            diff[16] = diff[0];
-            diff[17] = diff[1];
-            diff[18] = diff[2];
-            diff[19] = diff[3];
-            diff[20] = diff[4];
-            diff[21] = diff[5];
-            diff[22] = diff[6];
-            diff[23] = diff[7];
-            diff[24] = diff[8];
-
-            short int flag_d_min2[NUM - 1];
-            short int flag_d_max2[NUM - 1];
-            short int flag_d_min4[NUM - 3];
-            short int flag_d_max4[NUM - 3];
-            short int flag_d_min8[NUM - 7];
-            short int flag_d_max8[NUM - 7];
-
-            for (ap_uint<5> i = 0; i < NUM - 1; i++) {
-#pragma HLS UNROLL
-                flag_d_min2[i] = __MIN(diff[i], diff[i + 1]);
-                flag_d_max2[i] = __MAX(diff[i], diff[i + 1]);
-            }
-
-            for (ap_uint<5> i = 0; i < NUM - 3; i++) {
-#pragma HLS UNROLL
-                flag_d_min4[i] = __MIN(flag_d_min2[i], flag_d_min2[i + 2]);
-                flag_d_max4[i] = __MAX(flag_d_max2[i], flag_d_max2[i + 2]);
-            }
-
-            for (ap_uint<5> i = 0; i < NUM - 7; i++) {
-#pragma HLS UNROLL
-                flag_d_min8[i] = __MIN(flag_d_min4[i], flag_d_min4[i + 4]);
-                flag_d_max8[i] = __MAX(flag_d_max4[i], flag_d_max4[i + 4]);
-            }
-
-            uchar_t a0 = THRESHOLD;
-
-            for (ap_uint<5> i = 0; i < PSize; i += 2) {
-#pragma HLS UNROLL
-                short int a = 255;
-                if (PSize == 16) {
-                    a = flag_d_min8[i + 1];
-                }
-                //		else {
-                //			for(ap_uint<5> j=1;j<PSize/2+1;j++)
-                //			{
-                //				a=__MIN(a,flag_d[i+j]);
-                //			}
-                //		}
-                a0 = __MAX(a0, __MIN(a, diff[i])); // a0 >= THRESHOLD
-                a0 = __MAX(a0, __MIN(a, diff[i + PSize / 2 + 1]));
-            }
-            short int b0 = -THRESHOLD;
-            for (ap_uint<5> i = 0; i < PSize; i += 2) {
-#pragma HLS UNROLL
-                short int b = -255;
-                if (PSize == 16) {
-                    b = flag_d_max8[i + 1];
-                }
-                //		} else {
-                //			for(ap_uint<5> j=1;j<PSize/2+1;j++)
-                //			{
-                //				b=__MAX(b,flag_d[i+j]);
-                //			}
-                //		}
-                b0 = __MIN(b0, __MAX(b, diff[i])); // b0 <= -THRESHOLD
-                b0 = __MIN(b0, __MAX(b, diff[i + PSize / 2 + 1]));
-            }
-            NMS_score_buf[i][j] = __MAX(a0, -b0) - 1;
-
-
-            ap_uint<1> posJudge[24];
-#pragma HLS ARRAY_PARTITION variable=posJudge complete dim=1
-            ap_uint<1> negJudge[24];
-#pragma HLS ARRAY_PARTITION variable=negJudge complete dim=1
-
-            for (ap_uint<5> ii = 0; ii < 16; ii++) {
-#pragma HLS unroll
-                posJudge[ii] = (diff[ii] > THRESHOLD) ? 1 : 0;
-                negJudge[ii] = (diff[ii] < -THRESHOLD) ? 1 : 0;
-            }
-
-
-            for (ap_uint<5> ii = 0; ii < 8; ii++) {
-#pragma HLS unroll
-                posJudge[ii + 16] = (diff[ii] > THRESHOLD) ? 1 : 0;
-                negJudge[ii + 16] = (diff[ii] < -THRESHOLD) ? 1 : 0;
-            }
-
-
-            ap_uint<1> fpJudge[16];
-#pragma HLS ARRAY_PARTITION variable=fpJudge complete dim=1
-            for (ap_uint<5> ii = 0; ii < 16; ii++) {
-#pragma HLS unroll
-                fpJudge[ii] =
-                        (posJudge[ii] & posJudge[ii + 1] & posJudge[ii + 2] & posJudge[ii + 3] & posJudge[ii + 4] &
-                         posJudge[ii + 5] & posJudge[ii + 6] & posJudge[ii + 7] & posJudge[ii + 8]) |
-                        (negJudge[ii] & negJudge[ii + 1] & negJudge[ii + 2] & negJudge[ii + 3] & negJudge[ii + 4] &
-                         negJudge[ii + 5] & negJudge[ii + 6] & negJudge[ii + 7] & negJudge[ii + 8]);
-            }
-            NMS_FAST_buf[i][j] = (fpJudge[0] | fpJudge[1] | fpJudge[2] | fpJudge[3] | fpJudge[4] | fpJudge[5] |
-                                  fpJudge[6] | fpJudge[7] | fpJudge[8] | fpJudge[9] | fpJudge[10] | fpJudge[11] |
-                                  fpJudge[12] | fpJudge[13] | fpJudge[14] | fpJudge[15]);
-            if (NMS_FAST_buf[i][j] == 0)
-                NMS_score_buf[i][j] = 0;
-
-        }
-        ///////////////////////////
+    single_loop(0, win_buf, NMS_score_buf, NMS_FAST_buf, win_ind);
+    single_loop(1, win_buf, NMS_score_buf, NMS_FAST_buf, win_ind);
+    single_loop(2, win_buf, NMS_score_buf, NMS_FAST_buf, win_ind);
     ap_uint<3> i = 1;
     for (ap_uint<8> j = 1; j < PROCESS_NUM + 1; j++) {
 #pragma HLS unroll
