@@ -1106,9 +1106,6 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
         // And add the keypoints to the output
         _keypoints.insert(_keypoints.end(), keypoints.begin(), keypoints.end());
     }
-    ofstream ofile, oimg;
-    ofile.open("/home/xilinx/Packages/ORB_SLAM2_new_exp/extractor_log.txt");
-    oimg.open("/home/xilinx/Packages/ORB_SLAM2_new_exp/wrong_img.txt");
 #else
     if(_image.empty())
         return;
@@ -1135,17 +1132,10 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
     mapped_dma_cfg_base[0] = 1;
     mapped_dma_data_base[0] = 1;
     mapped_dma_data_base[0x30 / 4] = 1;
-    // for (int i = 0; i < image.cols * image.rows; i++){
-    //     oimg << int(addrptr_data_in[i]) << endl;
-    // }
-    // oimg.close();
     vector < vector < vector<int> > > allKeypoints;
     
-    // printf("start\n");
-    // printf("-----------\n");
     for (int level = 1; level < nlevels; ++level)
     {
-        // printf("level%d\n",level);
         vector< vector <int> > levelKeypoints;
         double scale = mvScaleFactor[level];
         addrptr_cfg_in[2] = scale * pow(2, 14);
@@ -1158,28 +1148,26 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
 
         mapped_dma_data_base[0x48 / 4] = cma_get_phy_addr(addrptr_data_out);
         mapped_dma_data_base[0x58 / 4] = sizeof(uint32_t)*16*257;
-
-        // auto start = std::chrono::high_resolution_clock::now();
+#ifdef DEBUG
+        auto start = std::chrono::high_resolution_clock::now();
+#endif
         do
         {
             usleep(10);
         } while (!((mapped_dma_data_base[0x34 / 4] >> 1) & 0x1));
-        // auto end = std::chrono::high_resolution_clock::now();
-        // std::chrono::duration<double, std::milli> tm = end - start;
-        // printf("features detected in %.5fms\n", tm.count());
+#ifdef DEBUG
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> tm = end - start;
+        printf("features detected in %.5fms\n", tm.count());
+#endif
         
-        // printf("wait exit\n");
-
         int level_kp_num = mapped_dma_data_base[0x58 / 4]/64 - 1;
-        // printf("level_kp_num%d\n", level_kp_num);
-
         int level_kp_reserve_num = level_kp_num;
         if (level_kp_reserve_num > mnFeaturesPerLevel[level])
             level_kp_reserve_num = mnFeaturesPerLevel[level];
         int kp_ind = 0;
         int it_ind = level_kp_num - 1;
         
-        // ofile << "level " << level << endl;
         while (kp_ind < level_kp_reserve_num && it_ind >= 0)
         {
             vector<int> Kp;
@@ -1188,28 +1176,22 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
             Kp.push_back((addrptr_data_out[it_ind*16] >> 7) & 0b111111111);
             Kp.push_back((addrptr_data_out[it_ind*16] >> 16) & 0b111111111);
             Kp.push_back((addrptr_data_out[it_ind*16] >> 25) + ((addrptr_data_out[it_ind*16+1] & 0b1111) << 7));
-            // ofile << ((addrptr_data_out[it_ind*16] >> 16) & 0b111111111)*scale << " " << float((addrptr_data_out[it_ind*16] >> 25) + ((addrptr_data_out[it_ind*16+1] & 0b1111) << 7)) * scale << endl;
-            // ofile << ((addrptr_data_out[it_ind*16] >> 16) & 0b111111111) << " " << float((addrptr_data_out[it_ind*16] >> 25) + ((addrptr_data_out[it_ind*16+1] & 0b1111) << 7)) << endl;
 
             for (int desc_ind = 0; desc_ind < 8; desc_ind++)
             {
                 Kp.push_back((addrptr_data_out[it_ind*16+desc_ind+1] >> 4) + ((addrptr_data_out[it_ind*16+desc_ind+2] & 0b1111) << 28));
             }
             
-            //if (scale * Kp[3] <= image.cols - 1 || scale * Kp[2] <= image.rows - 1)
             if (Kp[3]!=0 && Kp[2] != 0){
                 levelKeypoints.push_back(Kp);
                 kp_ind++;
             }
             it_ind--;
         }
-        // printf("Kp ready\n");
 
         allKeypoints.push_back(levelKeypoints);
-        // printf("copy result exit\n");
                 
         nkeypoints += kp_ind;
-        // printf("level_kp_num%d\n",level_kp_num);        
     }
 
     if( nkeypoints == 0 )
@@ -1224,12 +1206,9 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
     int offset = 0;
     for (int level = 0; level < nlevels; ++level)
     {
-        // ofile << "level " << level << endl;
         vector< vector <int> >& levelKeypoints = allKeypoints[level];
         int level_kp_num =levelKeypoints.size();
         float scale = mvScaleFactor[level];
-        // ofile << "scale " << scale << endl;
-        // ofile << "level_kp_num " << level_kp_num <<endl;
 
         Mat desc = descriptors.rowRange(offset, offset + level_kp_num);
         desc = Mat::zeros(level_kp_num, 32, CV_8UC1);
@@ -1242,10 +1221,9 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
                         levelKeypoints[kp_ind][0],
                         level,
                         -1);
-            // printf("%lf %lf %lf %lf %lf %d %d \n", Kp.pt.x, Kp.pt.y, Kp.size, Kp.angle, Kp.response, Kp.octave, Kp.class_id);
-            // ofile << Kp.pt.x << " " << Kp.pt.y << " " << Kp.size << " " << Kp.angle << " " << Kp.response << " " << Kp.octave << " " << Kp.class_id << endl;
-            // if (Kp.pt.x > image.cols - 1 || Kp.pt.y > image.rows - 1)
-            //     ofile << Kp.pt.x << " " << Kp.pt.y << " " << Kp.size << " " << Kp.angle << " " << Kp.response << " " << Kp.octave << " " << Kp.class_id << endl;
+#ifdef DEBUG
+            printf("%lf %lf %lf %lf %lf %d %d \n", Kp.pt.x, Kp.pt.y, Kp.size, Kp.angle, Kp.response, Kp.octave, Kp.class_id);
+#endif
             _keypoints.push_back(Kp);
             for (int i = 0; i < 8; i++){
                 desc.ptr(kp_ind)[i * 4 + 0] = levelKeypoints[kp_ind][4 + i] & 0xFF;
@@ -1261,8 +1239,6 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
     cma_free(addrptr_cfg_in);
     cma_free(addrptr_data_in);
     cma_free(addrptr_data_out);
-    // ofile << "exit" <<endl;
-    // ofile.close();
 #endif
 }
 
