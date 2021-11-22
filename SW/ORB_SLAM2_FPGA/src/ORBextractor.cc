@@ -1134,7 +1134,7 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
     mapped_dma_data_base[0x30 / 4] = 1;
     vector < vector < vector<int> > > allKeypoints;
     
-    for (int level = 1; level < nlevels; ++level)
+    for (int level = 0; level < nlevels; ++level)
     {
         vector< vector <int> > levelKeypoints;
         double scale = mvScaleFactor[level];
