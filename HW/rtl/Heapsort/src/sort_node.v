@@ -1,3 +1,23 @@
+/**
+* This file is part of ac^2SLAM.
+*
+* Copyright (C) 2021 Cheng Wang <wangcheng at stu dot xjtu dot edu dot cn> (Xi'an Jiaotong University)
+* For more information see <https://github.com/SLAM-Hardware/acSLAM>
+*
+* ac^2SLAM is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* ac^2SLAM is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with ac^2SLAM. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 `timescale 1ns / 1ps
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -165,7 +185,7 @@ always@(*) begin
 			nl_update_out = 1;  
 			//lm_we_delay = 1;  
 			lm_we = 1;
-			rm_we = 0;   //ÓÒ±ß²»Œ€»�?
+			rm_we = 0;   //ÓÒ±ß²»Œ€»�?
 			nl_branch_out = 0;  //Ñ¡×ó±ß
 		end
 

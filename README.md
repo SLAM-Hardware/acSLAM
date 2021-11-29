@@ -1,5 +1,18 @@
-# acSLAM
-
+# ac^2SLAM
+## License
+ac^2SLAM is released under a GPLv3 license.
+If you use ac^2SLAM in an academic work, please cite the publication.
+```
+@INPROCEEDINGS{9609808,
+  author={Wang, Cheng and Liu, Yingkun and Zuo, Kedai and Tong, Jianming and Ding, Yan and Ren, Pengju},
+  booktitle={2021 International Conference on Field-Programmable Technology (ICFPT)}, 
+  title={ac<sup>2</sup>SLAM: FPGA Accelerated High-Accuracy SLAM with Heapsort and Parallel Keypoint Extractor}, 
+  year={2021},
+  volume={},
+  number={},
+  pages={1-9},
+  doi={10.1109/ICFPT52863.2021.9609808}}
+```
 ## Introduction
 Simultaneous Localization and Mapping (SLAM) is the algorithm for constructing a map and keeping tracking robot localization in unknown surroundings, which is critical for acting as the necessary underlying component to support high-level applications, like navigation and multi-agent collaboration.
 When it comes to deployment on autonomous mobile robots, constrained by the stringent power budget and physical size, the compute power on embedded devices is insufficient to serve the SLAM algorithms in real-time.
