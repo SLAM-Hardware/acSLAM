@@ -14,9 +14,7 @@ If you use ac^2SLAM in an academic work, please cite the publication.
   doi={10.1109/ICFPT52863.2021.9609808}}
 ```
 ## DOI
-···
 https://doi.org/10.5281/zenodo.5735556
-···
 ## Introduction
 Simultaneous Localization and Mapping (SLAM) is the algorithm for constructing a map and keeping tracking robot localization in unknown surroundings, which is critical for acting as the necessary underlying component to support high-level applications, like navigation and multi-agent collaboration.
 When it comes to deployment on autonomous mobile robots, constrained by the stringent power budget and physical size, the compute power on embedded devices is insufficient to serve the SLAM algorithms in real-time.
