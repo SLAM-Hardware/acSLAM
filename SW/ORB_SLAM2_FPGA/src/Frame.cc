@@ -75,10 +75,8 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();
 
     // ORB extraction
-    thread threadLeft(&Frame::ExtractORB,this,0,imLeft);
-    threadLeft.join();
-    thread threadRight(&Frame::ExtractORB,this,1,imRight);
-    threadRight.join();
+    ExtractORB(0,true,imLeft);
+    ExtractORB(1,true,imRight);
 
     N = mvKeys.size();
 
@@ -133,7 +131,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
     mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();
 
     // ORB extraction
-    ExtractORB(0,imGray);
+    ExtractORB(0,false,imGray);
 
     N = mvKeys.size();
 
@@ -188,7 +186,7 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
     mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();
 
     // ORB extraction
-    ExtractORB(0,imGray);
+    ExtractORB(0,false,imGray);
 
     N = mvKeys.size();
 
@@ -244,12 +242,12 @@ void Frame::AssignFeaturesToGrid()
     }
 }
 
-void Frame::ExtractORB(int flag, const cv::Mat &im)
+void Frame::ExtractORB(int flag, bool stereo, const cv::Mat &im)
 {
     if(flag==0)
-        (*mpORBextractorLeft)(im,cv::Mat(),mvKeys,mDescriptors);
+        (*mpORBextractorLeft)(im,cv::Mat(),mvKeys,mDescriptors, stereo);
     else
-        (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight);
+        (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight, stereo);
 }
 
 void Frame::SetPose(cv::Mat Tcw)
@@ -485,8 +483,8 @@ void Frame::ComputeStereoMatches()
         const cv::KeyPoint &kp = mvKeysRight[iR];
         const float &kpY = kp.pt.y;
         const float r = 2.0f*mvScaleFactors[mvKeysRight[iR].octave];
-        const int maxr = ceil(kpY+r);
-        const int minr = floor(kpY-r);
+        const int maxr = min(nRows - 1, int(ceil(kpY+r)));
+        const int minr = max(0, int(floor(kpY-r)));
 
         for(int yi=minr;yi<=maxr;yi++)
             vRowIndices[yi].push_back(iR);
@@ -560,7 +558,31 @@ void Frame::ComputeStereoMatches()
 
             // sliding window search
             const int w = 5;
-            cv::Mat IL = mpORBextractorLeft->mvImagePyramid[kpL.octave].rowRange(scaledvL-w,scaledvL+w+1).colRange(scaleduL-w,scaleduL+w+1);
+
+            int nRowsLevel = mpORBextractorLeft->mvImagePyramid[kpL.octave].rows;
+            int nColsLevel = mpORBextractorLeft->mvImagePyramid[kpL.octave].cols;
+            int rowB = scaledvL-w;
+            int rowU = scaledvL+w+1;
+            int colB = scaleduL-w;
+            int colU = scaleduL+w+1;
+            if (rowU > nRowsLevel){
+                rowB -= rowU - nRowsLevel;
+                rowU = nRowsLevel;
+            }
+            if (rowB < 0){
+                rowU -= rowB;
+                rowB = 0;
+            }
+            if (colU > nColsLevel){
+                colB -= colU - nColsLevel;
+                colU = nColsLevel;
+            }
+            if (colB < 0){
+                colU -= colB;
+                colB = 0;
+            }
+
+            cv::Mat IL = mpORBextractorLeft->mvImagePyramid[kpL.octave].rowRange(rowB,rowU).colRange(colB,colU);
             IL.convertTo(IL,CV_32F);
             IL = IL - IL.at<float>(w,w) *cv::Mat::ones(IL.rows,IL.cols,CV_32F);
 
@@ -577,7 +599,9 @@ void Frame::ComputeStereoMatches()
 
             for(int incR=-L; incR<=+L; incR++)
             {
-                cv::Mat IR = mpORBextractorRight->mvImagePyramid[kpL.octave].rowRange(scaledvL-w,scaledvL+w+1).colRange(scaleduR0+incR-w,scaleduR0+incR+w+1);
+                if ((scaleduR0+incR-w < 0) || (scaleduR0+incR+w+1 > mpORBextractorRight->mvImagePyramid[kpL.octave].cols))
+                    continue;
+                cv::Mat IR = mpORBextractorRight->mvImagePyramid[kpL.octave].rowRange(rowB,rowU).colRange(scaleduR0+incR-w,scaleduR0+incR+w+1);
                 IR.convertTo(IR,CV_32F);
                 IR = IR - IR.at<float>(w,w) *cv::Mat::ones(IR.rows,IR.cols,CV_32F);
 

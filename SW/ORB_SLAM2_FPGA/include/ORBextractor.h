@@ -58,7 +58,7 @@ public:
     // Mask is ignored in the current implementation.
     void operator()( cv::InputArray image, cv::InputArray mask,
       std::vector<cv::KeyPoint>& keypoints,
-      cv::OutputArray descriptors);
+      cv::OutputArray descriptors, bool stereo);
 
     int inline GetLevels(){
         return nlevels;}

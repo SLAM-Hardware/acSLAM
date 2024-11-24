@@ -1044,7 +1044,7 @@ static void computeDescriptors(const Mat& image, vector<KeyPoint>& keypoints, Ma
 }
 
 void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPoint>& _keypoints,
-                      OutputArray _descriptors)
+                      OutputArray _descriptors, bool stereo)
 { 
 #ifdef SOFTWARE_RUN
     if(_image.empty())
@@ -1112,6 +1112,10 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
 
     Mat image = _image.getMat();
     assert(image.type() == CV_8UC1 );
+
+    // Pre-compute the scale pyramid
+    if (stereo)
+        ComputePyramid(image);
 
     int buffer_len = image.cols * image.rows;
     uint32_t* mapped_dma_cfg_base = reinterpret_cast<uint32_t*>(cma_mmap(0xA0000000, sizeof(uint32_t)*24));
